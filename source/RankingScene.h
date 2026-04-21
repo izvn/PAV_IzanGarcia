@@ -4,17 +4,22 @@
 #include "RenderManager.h"
 #include "GameConfig.h"
 #include "Button.h"
-#include "TextObject.h"
 #include <vector>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <cstring>
+
+struct ScoreRecord {
+    char name[16];
+    int score;
+};
 
 class RankingScene : public Scene {
 private:
-    int spaceScores[10];
-    int tanksScores[10];
-    int splatScores[10];
+    ScoreRecord spaceScores[10];
+    ScoreRecord tanksScores[10];
+    ScoreRecord splatScores[10];
 
     Button* btnBack;
 
@@ -41,9 +46,12 @@ public:
         backgroundTexture(nullptr)
     {
         for (int i = 0; i < 10; i++) {
-            spaceScores[i] = 0;
-            tanksScores[i] = 0;
-            splatScores[i] = 0;
+            strcpy_s(spaceScores[i].name, sizeof(spaceScores[i].name), "---");
+            spaceScores[i].score = 0;
+            strcpy_s(tanksScores[i].name, sizeof(tanksScores[i].name), "---");
+            tanksScores[i].score = 0;
+            strcpy_s(splatScores[i].name, sizeof(splatScores[i].name), "---");
+            splatScores[i].score = 0;
         }
     }
 
@@ -110,36 +118,41 @@ public:
         btnBack->Render();
     }
 
-    void AddScoreToRanking(int mode, int newScore) {
+    void AddScoreToRanking(int mode, const std::string& name, int newScore) {
         if (newScore <= 0) return;
-        int* arr = nullptr;
+        ScoreRecord* arr = nullptr;
         if (mode == 0) arr = spaceScores;
         else if (mode == 1) arr = tanksScores;
         else if (mode == 2) arr = splatScores;
 
-        std::vector<int> temp(arr, arr + 10);
-        temp.push_back(newScore);
-        std::sort(temp.begin(), temp.end(), std::greater<int>());
-        temp.resize(10);
+        std::vector<ScoreRecord> temp(arr, arr + 10);
+        ScoreRecord newRecord;
+        std::string finalName = name.empty() ? "Player" : name;
+        strncpy_s(newRecord.name, sizeof(newRecord.name), finalName.c_str(), _TRUNCATE);
+        newRecord.score = newScore;
+        temp.push_back(newRecord);
+
+        std::sort(temp.begin(), temp.end(), [](const ScoreRecord& a, const ScoreRecord& b) {
+            return a.score > b.score;
+            });
+
         for (int i = 0; i < 10; i++) {
             arr[i] = temp[i];
         }
     }
 
-    static void InsertScoreForMode(int mode, int score) {
+    static void InsertScoreForMode(int mode, const std::string& name, int score) {
         RankingScene* ranking = dynamic_cast<RankingScene*>(SM.GetScene("RankingScene"));
         if (ranking) {
-            ranking->AddScoreToRanking(mode, score);
+            ranking->AddScoreToRanking(mode, name, score);
             ranking->SaveScoresToFile();
         }
     }
 
 private:
     void LoadScoresFromFile() {
-        std::ifstream file("resources/highscores.bin", std::ios::binary);
-        if (!file.is_open()) {
-            return;
-        }
+        std::ifstream file("resources/highscores_v2.bin", std::ios::binary);
+        if (!file.is_open()) return;
         file.read(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
         file.read(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
         file.read(reinterpret_cast<char*>(splatScores), sizeof(splatScores));
@@ -147,10 +160,8 @@ private:
     }
 
     void SaveScoresToFile() {
-        std::ofstream file("resources/highscores.bin", std::ios::binary | std::ios::trunc);
-        if (!file.is_open()) {
-            return;
-        }
+        std::ofstream file("resources/highscores_v2.bin", std::ios::binary | std::ios::trunc);
+        if (!file.is_open()) return;
         file.write(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
         file.write(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
         file.write(reinterpret_cast<char*>(splatScores), sizeof(splatScores));
@@ -183,9 +194,9 @@ private:
         SDL_RenderCopy(RM.GetRenderer(), tex, nullptr, &dst);
     }
 
-    void RenderScore(int score, int x, int y) {
-        char buffer[32];
-        sprintf_s(buffer, "%d", score);
+    void RenderScore(const ScoreRecord& record, int x, int y) {
+        char buffer[64];
+        sprintf_s(buffer, "%s - %d", record.name, record.score);
         SDL_Texture* scoreTex = CreateTextTexture(buffer, fontTitle, nullptr, nullptr);
         RenderTexture(scoreTex, x, y, 0, 0, true);
         if (scoreTex) SDL_DestroyTexture(scoreTex);

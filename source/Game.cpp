@@ -12,6 +12,7 @@
 #include "SpaceInvadersPauseScene.h"
 #include "TanksPauseScene.h"
 #include "SplatPauseScene.h"
+#include "GameOverScene.h"
 
 void Game::Init() {
     RM.Init();
@@ -105,6 +106,7 @@ void Game::Init() {
     SM.AddScene("SpaceInvadersPause", new SpaceInvadersPauseScene());
     SM.AddScene("TanksPause", new TanksPauseScene());
     SM.AddScene("SplatPause", new SplatPauseScene());
+    SM.AddScene("GameOver", new GameOverScene());
 
     SM.InitFirstScene("SplashScreen");
 }
@@ -123,4 +125,3 @@ void Game::Release() {
     SM.GetCurrentScene()->OnExit();
     RM.Release();
 }
-

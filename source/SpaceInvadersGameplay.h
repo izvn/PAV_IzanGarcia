@@ -47,13 +47,12 @@ public:
         scoreText(nullptr),
         livesText(nullptr),
         highScoreText(nullptr),
-        paused(false)  
+        paused(false)
     {
     }
 
     void OnEnter() override {
         if (paused) {
-            std::cout << "[INFO] Reanudando SpaceInvaders sin reiniciar.\n";
             return;
         }
 
@@ -88,16 +87,12 @@ public:
             totalWaves = (int)waveCounts.size();
             SpawnRandomWave();
         }
-        else {
-            std::cout << "[ERROR] No se cargaron waves para SpaceInvaders.\n";
-        }
     }
 
     void OnExit() override {
         if (SM.GetNextSceneName() == "SpaceInvadersPause")
         {
-            paused = true; 
-            std::cout << "El juego se ha pausado\n";
+            paused = true;
             return;
         }
 
@@ -163,7 +158,6 @@ private:
 
             rapidxml::xml_node<>* root = doc.first_node("waves");
             if (!root) {
-                std::cout << "[ERROR] No se encontró <waves> en " << filePath << "\n";
                 return;
             }
 
@@ -174,10 +168,8 @@ private:
                 }
                 waveCounts.push_back(count);
             }
-            std::cout << "[INFO] Cargadas " << waveCounts.size() << " waves en SpaceInvaders.\n";
         }
         catch (std::exception& e) {
-            std::cout << "[ERROR] Excepción leyendo XML " << filePath << ": " << e.what() << "\n";
         }
     }
 
@@ -185,7 +177,6 @@ private:
         if (waveCounts.empty()) return;
         int randomIndex = rand() % waveCounts.size();
         int count = waveCounts[randomIndex];
-        std::cout << "[INFO] wave count=" << count << "\n";
 
         AM.PlayClip("space_invaders_end_wave", 0);
 
@@ -245,7 +236,8 @@ private:
             score += player->GetLives() * 10000;
         }
         gameOver = true;
-        RankingScene::InsertScoreForMode(0, score);
-        SM.SetNextScene("MainMenu");
+        GameConfig::pendingMode = 0;
+        GameConfig::pendingScore = score;
+        SM.SetNextScene("GameOver");
     }
 };

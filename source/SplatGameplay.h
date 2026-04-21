@@ -54,7 +54,6 @@ public:
     void OnEnter() override {
         if (paused)
         {
-            std::cout << "[INFO] Reanudando SplatGameplay sin reiniciar.\n";
             return;
         }
 
@@ -88,16 +87,12 @@ public:
             totalWaves = (int)waveCounts.size();
             SpawnRandomWave();
         }
-        else {
-            std::cout << "[ERROR] No se cargaron waves para Splat.\n";
-        }
     }
 
     void OnExit() override {
         if (SM.GetNextSceneName() == "SplatPause")
         {
             paused = true;
-            std::cout << "El juego se ha pausado\n";
             return;
         }
         AM.StopMusic();
@@ -161,7 +156,6 @@ private:
 
             rapidxml::xml_node<>* root = doc.first_node("waves");
             if (!root) {
-                std::cout << "[ERROR] No se encontró <waves> en " << filePath << "\n";
                 return;
             }
 
@@ -172,10 +166,8 @@ private:
                 }
                 waveCounts.push_back(count);
             }
-            std::cout << "[INFO] Cargadas " << waveCounts.size() << " waves en Splat.\n";
         }
         catch (std::exception& e) {
-            std::cout << "[ERROR] Excepción leyendo " << filePath << ": " << e.what() << "\n";
         }
     }
 
@@ -183,8 +175,6 @@ private:
         if (waveCounts.empty()) return;
         int randomIndex = rand() % waveCounts.size();
         int count = waveCounts[randomIndex];
-
-        std::cout << "[INFO] Splat wave (aleatoria) con count=" << count << "\n";
 
         for (int i = 0; i < count; i++) {
             Vector2 pos((float)(rand() % RM.WINDOW_WIDTH), (float)(rand() % RM.WINDOW_HEIGHT));
@@ -236,7 +226,8 @@ private:
             score += player->GetLives() * 10000;
         }
         gameOver = true;
-        RankingScene::InsertScoreForMode(2, score);
-        SM.SetNextScene("MainMenu");
+        GameConfig::pendingMode = 2;
+        GameConfig::pendingScore = score;
+        SM.SetNextScene("GameOver");
     }
 };

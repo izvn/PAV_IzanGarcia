@@ -191,5 +191,8 @@
     <ClInclude Include="source\SplatPauseScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\GameOverScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

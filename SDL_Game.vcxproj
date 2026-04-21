@@ -41,6 +41,7 @@
     <ClInclude Include="source\Game.h" />
     <ClInclude Include="source\GameConfig.h" />
     <ClInclude Include="source\GameObject.h" />
+    <ClInclude Include="source\GameOverScene.h" />
     <ClInclude Include="source\Gameplay.h" />
     <ClInclude Include="source\ImageButton.h" />
     <ClInclude Include="source\ImageObject.h" />

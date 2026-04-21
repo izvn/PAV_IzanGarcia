@@ -59,14 +59,13 @@ public:
         scoreText(nullptr),
         livesText(nullptr),
         highScoreText(nullptr),
-        paused(false) 
+        paused(false)
     {
     }
 
     void OnEnter() override {
         if (paused)
         {
-            std::cout << "[INFO] Reanudando TanksGameplay sin reiniciar.\n";
             return;
         }
 
@@ -100,16 +99,12 @@ public:
             totalWaves = (int)wavesData.size();
             SpawnRandomWave();
         }
-        else {
-            std::cout << "[ERROR] wavesData está vacío\n";
-        }
     }
 
     void OnExit() override {
         if (SM.GetNextSceneName() == "TanksPause")
         {
             paused = true;
-            std::cout << "El juego se ha pausado\n";
             return;
         }
 
@@ -174,7 +169,6 @@ private:
 
             rapidxml::xml_node<>* root = doc.first_node("waves");
             if (!root) {
-                std::cout << "[ERROR] No se encontró <waves> en " << filePath << "\n";
                 return;
             }
 
@@ -196,10 +190,8 @@ private:
                 }
                 wavesData.push_back(waveEnemies);
             }
-            std::cout << "[INFO] Cargadas " << wavesData.size() << " waves desde " << filePath << "\n";
         }
         catch (std::exception& e) {
-            std::cout << "[ERROR] Excepción leyendo " << filePath << ": " << e.what() << "\n";
         }
     }
 
@@ -207,7 +199,6 @@ private:
         if (wavesData.empty()) return;
 
         int randomIndex = rand() % wavesData.size();
-        std::cout << "[INFO] Spawneando wave aleatoria en index: " << randomIndex << "\n";
 
         for (auto& ei : wavesData[randomIndex]) {
             for (int i = 0; i < ei.count; i++) {
@@ -238,7 +229,6 @@ private:
             newEnemy = new ExplodingEnemy(pos);
         }
         else {
-            std::cout << "[WARN] Tipo desconocido: " << ei.type << ". Usamos BasicEnemyTanks\n";
             newEnemy = new BasicEnemyTanks(pos);
         }
 
@@ -296,7 +286,8 @@ private:
             score += player->GetLives() * 10000;
         }
         gameOver = true;
-        RankingScene::InsertScoreForMode(1, score);
-        SM.SetNextScene("MainMenu");
+        GameConfig::pendingMode = 1;
+        GameConfig::pendingScore = score;
+        SM.SetNextScene("GameOver");
     }
 };

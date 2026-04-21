@@ -42,6 +42,9 @@ public:
         return "resources/shoot_animation.png";
     }
 
+    static int pendingScore;
+    static int pendingMode;
+
 private:
     static int selectedBackground;
     static int selectedEnemies;
@@ -54,6 +57,8 @@ private:
 int GameConfig::selectedBackground = 0;
 int GameConfig::selectedEnemies = 0;
 int GameConfig::selectedVFX = 0;
+int GameConfig::pendingScore = 0;
+int GameConfig::pendingMode = 0;
 
 const std::vector<std::string> GameConfig::backgroundPaths = {
     "resources/SpriteBackground1.png",

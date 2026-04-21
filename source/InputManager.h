@@ -2,6 +2,7 @@
 #include <SDL.h>
 #include <unordered_map>
 #include <iostream>
+#include <string>
 
 enum KeyState { EMPTY, DOWN, UP, HOLD, RELEASED };
 
@@ -12,6 +13,7 @@ private:
     int mouseX, mouseY;
     bool leftClick;
     std::unordered_map<Sint32, KeyState> keyReference;
+    std::string inputText;
 
     InputManager() {
         SDL_GetMouseState(&mouseX, &mouseY);
@@ -37,7 +39,7 @@ public:
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
-                return true; 
+                return true;
             }
             else if (event.type == SDL_MOUSEBUTTONDOWN) {
                 if (event.button.button == SDL_BUTTON_LEFT) leftClick = true;
@@ -47,9 +49,18 @@ public:
             }
             else if (event.type == SDL_KEYDOWN) {
                 keyReference[event.key.keysym.sym] = DOWN;
+
+                if (event.key.keysym.sym == SDLK_BACKSPACE && !inputText.empty()) {
+                    inputText.pop_back();
+                }
             }
             else if (event.type == SDL_KEYUP) {
                 keyReference[event.key.keysym.sym] = UP;
+            }
+            else if (event.type == SDL_TEXTINPUT) {
+                if (inputText.length() < 12 && (unsigned char)event.text.text[0] >= 32 && (unsigned char)event.text.text[0] <= 126) {
+                    inputText += event.text.text[0];
+                }
             }
         }
         return false;
@@ -63,5 +74,9 @@ public:
         if (keyReference.find(input) == keyReference.end()) return false;
         return keyReference[input] == inputValue;
     }
-};
 
+    inline std::string GetInputText() const { return inputText; }
+    inline void ClearInputText() { inputText = ""; }
+    inline void StartTextInput() { SDL_StartTextInput(); }
+    inline void StopTextInput() { SDL_StopTextInput(); }
+};
