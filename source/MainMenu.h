@@ -18,17 +18,18 @@ private:
     const float audioCooldownDuration = 0.5f;
     bool canToggleAudio;
 
-    bool changeScenePending; 
+    bool changeScenePending;
     std::string pendingScene;
 
-    float sceneChangeDelay; 
-    const float delayDuration = 0.3f; 
+    float sceneChangeDelay;
+    const float delayDuration = 0.3f;
 
 public:
     MainMenu()
         : backgroundTex(nullptr), font(nullptr), titleFont(nullptr),
         audioCooldownTimer(0.0f), canToggleAudio(true),
-        changeScenePending(false), sceneChangeDelay(0.0f) {}
+        changeScenePending(false), sceneChangeDelay(0.0f) {
+    }
 
     void OnEnter() override {
         changeScenePending = false;
@@ -38,7 +39,8 @@ public:
         font = RM.GetFont("resources/fonts/fuente.otf");
         RM.LoadFont("resources/fonts/fuente.otf", 48);
         titleFont = RM.GetFont("resources/fonts/fuente.otf");
-        backgroundTex = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
+
+        backgroundTex = RM.GetTexture("resources/mainmenu.png");
 
         AM.PlaySong("menu_music");
 
@@ -88,23 +90,8 @@ public:
     void Render() override {
         SDL_Rect dest = { 0, 0, RM.WINDOW_WIDTH, RM.WINDOW_HEIGHT };
         SDL_RenderCopy(RM.GetRenderer(), backgroundTex, nullptr, &dest);
-        RenderTitle();
         for (auto* b : buttons) {
             b->Render();
-        }
-    }
-
-    void RenderTitle() {
-        if (titleFont) {
-            SDL_Color textColor = { 255, 255, 255, 255 };
-            SDL_Surface* textSurface = TTF_RenderText_Blended(titleFont, "MAIN MENU", textColor);
-            if (textSurface) {
-                SDL_Texture* textTexture = SDL_CreateTextureFromSurface(RM.GetRenderer(), textSurface);
-                SDL_Rect textRect = { RM.WINDOW_WIDTH / 2 - textSurface->w / 2, 20, textSurface->w, textSurface->h };
-                SDL_RenderCopy(RM.GetRenderer(), textTexture, nullptr, &textRect);
-                SDL_FreeSurface(textSurface);
-                SDL_DestroyTexture(textTexture);
-            }
         }
     }
 
@@ -145,6 +132,6 @@ public:
         pendingScene = sceneName;
         changeScenePending = true;
         sceneChangeDelay = delayDuration;
-        AM.PlayClip("button_click", 0); 
+        AM.PlayClip("button_click", 0);
     }
 };

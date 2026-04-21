@@ -47,6 +47,7 @@ void Game::Init() {
     RM.LoadTexture("resources/bullet_enemy.png");
     RM.LoadTexture("resources/SpaceInvadersBullet.png");
     RM.LoadTexture("resources/SplashScreen.png");
+    RM.LoadTexture("resources/mainmenu.png");
 
     RM.LoadTexture("resources/basicEnemy.png");
     RM.LoadTexture("resources/enemy.png");

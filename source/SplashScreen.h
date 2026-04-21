@@ -34,26 +34,7 @@ public:
             SDL_Rect destRect = { 0, 0, 1360, 768 };
             SDL_RenderCopy(RM.GetRenderer(), texture, nullptr, &destRect);
         }
-
-        if (font) {
-            RenderText("IZAN & ALEIX", 1360 / 2, 720);  
-        }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     void RenderText(const std::string& text, int x, int y) {
         SDL_Surface* textSurface = TTF_RenderText_Blended(font, text.c_str(), textColor);
