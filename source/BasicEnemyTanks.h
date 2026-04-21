@@ -20,7 +20,7 @@ public:
         currentStep(0)
     {
         transform->position = pos;
-        transform->scale = Vector2(1, 1);
+        transform->scale = Vector2(1.5f, 1.5f);
 
         if (renderer) {
             delete renderer;
@@ -29,18 +29,18 @@ public:
 
         renderer = new AnimatedImageRenderer(
             transform,
-            GameConfig::GetEnemySkin("enemy"), 
+            GameConfig::GetEnemySkin("enemy"),
             Vector2(0, 0),
-            32,   
-            32,  
-            2,    
-            0.5f, 
-            true  
+            32,
+            32,
+            2,
+            0.5f,
+            true
         );
     }
 
     void Update() override {
-        Enemy::Update(); 
+        Enemy::Update();
         patternTimer += TIME.GetDeltaTime();
         if (patternTimer >= patternTime) {
             patternTimer = 0;

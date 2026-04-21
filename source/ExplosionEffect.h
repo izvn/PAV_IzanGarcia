@@ -17,7 +17,7 @@ public:
         timer(0.0f)
     {
         transform->position = pos;
-        transform->scale = Vector2(1, 1);
+        transform->scale = Vector2(1.5f, 1.5f);
 
         if (renderer) {
             delete renderer;

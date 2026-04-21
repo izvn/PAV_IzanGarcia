@@ -20,7 +20,7 @@ private:
 
     bool isShooting;
     float shootAnimTimer;
-    const float shootAnimDuration = 0.4f; 
+    const float shootAnimDuration = 0.4f;
 
 public:
     BasicEnemy(Vector2 pos)
@@ -33,7 +33,7 @@ public:
         shootAnimTimer(0.0f)
     {
         transform->position = pos;
-        transform->scale = Vector2(1, 1);
+        transform->scale = Vector2(1.5f, 1.5f);
 
         minShootTime = 2.0f;
         maxShootTime = 5.0f;
@@ -59,11 +59,11 @@ public:
             transform,
             GameConfig::GetShootAnimationSprite(),
             Vector2(0, 0),
-            32,  
-            64,  
-            2,   
+            32,
+            64,
+            2,
             0.2f,
-            false 
+            false
         );
 
         renderer = normalRenderer;
@@ -78,7 +78,7 @@ public:
     }
 
     void Update() override {
-        Enemy::Update(); 
+        Enemy::Update();
 
         float dt = TIME.GetDeltaTime();
 
@@ -87,7 +87,7 @@ public:
             if (shootAnimTimer >= shootAnimDuration) {
                 isShooting = false;
                 shootAnimTimer = 0.0f;
-                renderer = normalRenderer; 
+                renderer = normalRenderer;
             }
         }
 

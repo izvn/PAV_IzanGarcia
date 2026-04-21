@@ -16,11 +16,11 @@ private:
     float swatRadius;
     bool wasLeftClickPressed;
 
-    AnimatedImageRenderer* normalRenderer; 
-    AnimatedImageRenderer* swatRenderer;   
+    AnimatedImageRenderer* normalRenderer;
+    AnimatedImageRenderer* swatRenderer;
 
-    bool isSwattingAnimation; 
-    float swatAnimationTimer;    
+    bool isSwattingAnimation;
+    float swatAnimationTimer;
     const float SWAT_DURATION = 0.5f;
 
 public:
@@ -32,7 +32,7 @@ public:
         stuckTimer(0),
         stuckDuration(1.0f),
         swatting(false),
-        swatRadius(50.0f),
+        swatRadius(75.0f),
         wasLeftClickPressed(false),
         normalRenderer(nullptr),
         swatRenderer(nullptr),
@@ -41,6 +41,7 @@ public:
     {
         transform->position = Vector2(RM.WINDOW_WIDTH / 2.0f, RM.WINDOW_HEIGHT / 2.0f);
         transform->rotation = 225.0f;
+        transform->scale = Vector2(1.5f, 1.5f);
 
         if (renderer) {
             delete renderer;
@@ -49,24 +50,24 @@ public:
 
         normalRenderer = new AnimatedImageRenderer(
             transform,
-            "resources/player_swat.png", 
+            "resources/player_swat.png",
             Vector2(0, 0),
-            32,   
-            64,  
-            2,    
-            0.5f, 
-            true   
+            32,
+            64,
+            2,
+            0.5f,
+            true
         );
 
         swatRenderer = new AnimatedImageRenderer(
             transform,
-            "resources/swat_animation.png", 
+            "resources/swat_animation.png",
             Vector2(0, 0),
-            32,  
-            64,   
-            2,    
-            0.2f,   
-            true    
+            32,
+            64,
+            2,
+            0.2f,
+            true
         );
 
         renderer = normalRenderer;
@@ -156,7 +157,7 @@ public:
         if (!isSwattingAnimation) {
             isSwattingAnimation = true;
             swatAnimationTimer = 0.0f;
-            renderer = swatRenderer; 
+            renderer = swatRenderer;
         }
     }
 

@@ -26,9 +26,9 @@ private:
     AnimatedImageRenderer* normalRenderer;
     AnimatedImageRenderer* shootRenderer;
 
-    bool isShooting;         
-    float shootAnimTimer;       
-    const float shootAnimDuration = 0.5f; 
+    bool isShooting;
+    float shootAnimTimer;
+    const float shootAnimDuration = 0.5f;
 
 public:
     AimingEnemy(Vector2 pos)
@@ -48,7 +48,7 @@ public:
         shootAnimTimer(0.0f)
     {
         transform->position = pos;
-        transform->scale = Vector2(1, 1);
+        transform->scale = Vector2(1.5f, 1.5f);
 
         if (renderer) {
             delete renderer;
@@ -59,22 +59,22 @@ public:
             transform,
             GameConfig::GetEnemySkin("enemy_aiming"),
             Vector2(0, 0),
-            32,   
-            64, 
-            2,   
-            0.5f, 
-            true  
+            32,
+            64,
+            2,
+            0.5f,
+            true
         );
 
         shootRenderer = new AnimatedImageRenderer(
             transform,
-            GameConfig::GetShootAnimationSprite(), 
+            GameConfig::GetShootAnimationSprite(),
             Vector2(0, 0),
-            32,    
-            64,    
-            2,     
-            0.25f,  
-            false   
+            32,
+            64,
+            2,
+            0.25f,
+            false
         );
 
         renderer = normalRenderer;
@@ -97,7 +97,7 @@ public:
             if (shootAnimTimer >= shootAnimDuration) {
                 isShooting = false;
                 shootAnimTimer = 0.0f;
-                renderer = normalRenderer; 
+                renderer = normalRenderer;
             }
         }
 
@@ -169,7 +169,7 @@ public:
     void OnCollisionEnter(Object* other) override {
         AM.PlayClip("tank_enemy_aiming_death", 0);
         if (Player* p = dynamic_cast<Player*>(other)) {
-            Destroy(); 
+            Destroy();
             p->LoseLife();
         }
     }

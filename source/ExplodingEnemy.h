@@ -12,8 +12,8 @@ private:
     float patternTimer;
     int currentStep;
 
-    float explosionRadius = 200.0f;  
-    float explosionForce = 800.0f;  
+    float explosionRadius = 300.0f;
+    float explosionForce = 800.0f;
 
 public:
     ExplodingEnemy(Vector2 pos)
@@ -24,7 +24,7 @@ public:
         currentStep(0)
     {
         transform->position = pos;
-        transform->scale = Vector2(1, 1);
+        transform->scale = Vector2(1.5f, 1.5f);
 
         if (renderer) {
             delete renderer;
@@ -34,11 +34,11 @@ public:
             transform,
             GameConfig::GetEnemySkin("enemy_exploding"),
             Vector2(0, 0),
-            32,    
-            64,   
-            2,   
-            0.5f, 
-            true 
+            32,
+            64,
+            2,
+            0.5f,
+            true
         );
     }
 
@@ -73,7 +73,7 @@ public:
     void OnCollisionEnter(Object* other) override {
         AM.PlayClip("tank_enemy_exploding_death", 0);
         if (Player* p = dynamic_cast<Player*>(other)) {
-            Destroy(); 
+            Destroy();
             p->LoseLife();
         }
     }
@@ -105,4 +105,3 @@ private:
         }
     }
 };
-

@@ -138,7 +138,6 @@ private:
     void LoadScoresFromFile() {
         std::ifstream file("resources/highscores.bin", std::ios::binary);
         if (!file.is_open()) {
-            std::cout << "No se pudo abrir highscores.bin, se inicializa a 0." << std::endl;
             return;
         }
         file.read(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
@@ -150,7 +149,6 @@ private:
     void SaveScoresToFile() {
         std::ofstream file("resources/highscores.bin", std::ios::binary | std::ios::trunc);
         if (!file.is_open()) {
-            std::cout << "No se pudo guardar highscores.bin" << std::endl;
             return;
         }
         file.write(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
@@ -161,7 +159,7 @@ private:
 
     SDL_Texture* CreateTextTexture(const std::string& text, TTF_Font* font, int* outW, int* outH) {
         if (!font) return nullptr;
-        SDL_Color color = { 255, 255, 255, 255 };
+        SDL_Color color = { 0, 0, 0, 255 };
         SDL_Surface* surf = TTF_RenderText_Blended(font, text.c_str(), color);
         if (!surf) return nullptr;
         SDL_Texture* tex = SDL_CreateTextureFromSurface(RM.GetRenderer(), surf);

@@ -6,7 +6,6 @@
 #include "AnimatedImageRenderer.h"
 #include <cmath>
 
-
 class TanksPlayer : public Player {
 private:
     float speed;
@@ -19,6 +18,7 @@ public:
         shootTimer(0)
     {
         transform->position = Vector2(RM.WINDOW_WIDTH / 2, RM.WINDOW_HEIGHT / 2);
+        transform->scale = Vector2(1.5f, 1.5f);
 
         if (renderer) {
             delete renderer;
@@ -27,13 +27,13 @@ public:
 
         renderer = new AnimatedImageRenderer(
             transform,
-            "resources/player_tank.png", 
+            "resources/player_tank.png",
             Vector2(0, 0),
-            64,   
-            128,   
-            2,     
-            0.5f, 
-            true   
+            64,
+            128,
+            2,
+            0.5f,
+            true
         );
     }
 
@@ -80,8 +80,8 @@ public:
         dir.Normalize();
 
         Vector2 bulletPos = transform->position;
-        bulletPos.x += dir.x * (transform->size.x / 2);
-        bulletPos.y += dir.y * (transform->size.y / 2);
+        bulletPos.x += dir.x * (transform->size.x / 2) * transform->scale.x;
+        bulletPos.y += dir.y * (transform->size.y / 2) * transform->scale.y;
 
         SPAWN.SpawnObject(new TanksPlayerBullet(bulletPos, dir));
     }

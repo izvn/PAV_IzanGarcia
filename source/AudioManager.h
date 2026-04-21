@@ -14,9 +14,9 @@ private:
 
     AudioManager() {
         int result = Mix_OpenAudio(
-            44100,             
-            MIX_DEFAULT_FORMAT, 
-            2, 
+            44100,
+            MIX_DEFAULT_FORMAT,
+            2,
             2048
         );
 
@@ -25,8 +25,8 @@ private:
             throw SDL_GetError();
         }
 
-        Mix_VolumeMusic(MIX_MAX_VOLUME);
-        Mix_Volume(-1, MIX_MAX_VOLUME);
+        Mix_VolumeMusic(MIX_MAX_VOLUME * 5 / 100);
+        Mix_Volume(-1, MIX_MAX_VOLUME * 5 / 100);
     }
 
     AudioManager(const AudioManager&) = delete;
@@ -75,8 +75,8 @@ public:
 
     void Unmute() {
         _muted = false;
-        Mix_VolumeMusic(MIX_MAX_VOLUME);
-        Mix_Volume(-1, MIX_MAX_VOLUME);
+        Mix_VolumeMusic(MIX_MAX_VOLUME * 30 / 100);
+        Mix_Volume(-1, MIX_MAX_VOLUME * 30 / 100);
     }
 
     bool GetMuted() const {

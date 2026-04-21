@@ -32,7 +32,8 @@ public:
         labelBgTex(nullptr), labelBgW(0), labelBgH(0),
         labelEnTex(nullptr), labelEnW(0), labelEnH(0),
         labelVfxTex(nullptr), labelVfxW(0), labelVfxH(0),
-        btnBack(nullptr) {}
+        btnBack(nullptr) {
+    }
     void OnEnter() override {
         backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
         RM.LoadFont("resources/fonts/fuente.otf", 28);
@@ -109,8 +110,8 @@ public:
     }
 private:
     SDL_Texture* CreateTextTexture(const std::string& text, TTF_Font* f, int* outW, int* outH) {
-        SDL_Color white = { 255, 255, 255, 255 };
-        SDL_Surface* surf = TTF_RenderText_Blended(f, text.c_str(), white);
+        SDL_Color color = { 0, 0, 0, 255 };
+        SDL_Surface* surf = TTF_RenderText_Blended(f, text.c_str(), color);
         SDL_Texture* tex = SDL_CreateTextureFromSurface(RM.GetRenderer(), surf);
         *outW = surf->w;
         *outH = surf->h;

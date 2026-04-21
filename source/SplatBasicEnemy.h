@@ -16,9 +16,9 @@ private:
     float patternTimer;
     int currentStep;
 
-    float timeOnPlayer; 
-    float damageCooldown; 
-    bool canDealDamage; 
+    float timeOnPlayer;
+    float damageCooldown;
+    bool canDealDamage;
 
 public:
     SplatBasicEnemy(Vector2 pos)
@@ -32,7 +32,7 @@ public:
         canDealDamage(true)
     {
         transform->position = pos;
-        transform->scale = Vector2(1, 1);
+        transform->scale = Vector2(1.5f, 1.5f);
         if (renderer) {
             delete renderer;
             renderer = nullptr;
@@ -55,7 +55,7 @@ public:
             damageCooldown -= dt;
             if (damageCooldown <= 0) {
                 canDealDamage = true;
-                damageCooldown = 2.0f; 
+                damageCooldown = 2.0f;
             }
         }
     }
@@ -86,10 +86,10 @@ public:
         if (Player* p = dynamic_cast<Player*>(other)) {
             if (!Input.GetLeftClick()) {
                 timeOnPlayer += TIME.GetDeltaTime();
-                if (timeOnPlayer >= 1.0f && canDealDamage) { 
+                if (timeOnPlayer >= 1.0f && canDealDamage) {
                     p->LoseLife();
-                    timeOnPlayer = 0; 
-                    canDealDamage = false; 
+                    timeOnPlayer = 0;
+                    canDealDamage = false;
                 }
             }
             else {

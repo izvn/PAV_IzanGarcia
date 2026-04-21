@@ -20,9 +20,9 @@ private:
     AnimatedImageRenderer* normalRenderer;
     AnimatedImageRenderer* shootRenderer;
 
-    bool isShooting;            
-    float shootAnimTimer;       
-    const float shootAnimDuration = 0.4f; 
+    bool isShooting;
+    float shootAnimTimer;
+    const float shootAnimDuration = 0.4f;
 
 public:
     ShootingEnemy(Vector2 pos)
@@ -40,7 +40,7 @@ public:
         shootAnimTimer(0.0f)
     {
         transform->position = pos;
-        transform->scale = Vector2(1, 1);
+        transform->scale = Vector2(1.5f, 1.5f);
 
         if (renderer) {
             delete renderer;
@@ -51,22 +51,22 @@ public:
             transform,
             GameConfig::GetEnemySkin("enemy_shooting"),
             Vector2(0, 0),
-            32,   
-            64,    
+            32,
+            64,
             2,
             0.5f,
-            true 
+            true
         );
 
         shootRenderer = new AnimatedImageRenderer(
             transform,
-            GameConfig::GetShootAnimationSprite(), 
+            GameConfig::GetShootAnimationSprite(),
             Vector2(0, 0),
-            32,     
-            64,     
-            2,     
-            0.2f,  
-            false 
+            32,
+            64,
+            2,
+            0.2f,
+            false
         );
 
         renderer = normalRenderer;
@@ -89,7 +89,7 @@ public:
             if (shootAnimTimer >= shootAnimDuration) {
                 isShooting = false;
                 shootAnimTimer = 0.0f;
-                renderer = normalRenderer; 
+                renderer = normalRenderer;
             }
         }
 
@@ -132,8 +132,8 @@ public:
         renderer = shootRenderer;
 
         Vector2 bulletPos = transform->position;
-        bulletPos.x += facingDir.x * (transform->size.x / 2);
-        bulletPos.y += facingDir.y * (transform->size.y / 2);
+        bulletPos.x += facingDir.x * (transform->size.x / 2) * transform->scale.x;
+        bulletPos.y += facingDir.y * (transform->size.y / 2) * transform->scale.y;
         SPAWN.SpawnObject(new EnemyBullet(bulletPos, facingDir));
     }
 
