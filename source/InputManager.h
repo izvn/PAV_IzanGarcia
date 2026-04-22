@@ -14,10 +14,13 @@ private:
     bool leftClick;
     std::unordered_map<Sint32, KeyState> keyReference;
     std::string inputText;
+    bool enterPressed;
 
     InputManager() {
         SDL_GetMouseState(&mouseX, &mouseY);
         leftClick = false;
+        enterPressed = false;
+        inputText = "";
     }
     InputManager(const InputManager&) = delete;
     InputManager& operator=(const InputManager&) = delete;
@@ -29,6 +32,7 @@ public:
     }
 
     bool Listen() {
+        enterPressed = false;
         for (auto& k : keyReference) {
             if (k.second == DOWN) k.second = HOLD;
             else if (k.second == UP) k.second = RELEASED;
@@ -49,17 +53,19 @@ public:
             }
             else if (event.type == SDL_KEYDOWN) {
                 keyReference[event.key.keysym.sym] = DOWN;
-
                 if (event.key.keysym.sym == SDLK_BACKSPACE && !inputText.empty()) {
                     inputText.pop_back();
+                }
+                if (event.key.keysym.sym == SDLK_RETURN || event.key.keysym.sym == SDLK_KP_ENTER) {
+                    enterPressed = true;
                 }
             }
             else if (event.type == SDL_KEYUP) {
                 keyReference[event.key.keysym.sym] = UP;
             }
             else if (event.type == SDL_TEXTINPUT) {
-                if (inputText.length() < 12 && (unsigned char)event.text.text[0] >= 32 && (unsigned char)event.text.text[0] <= 126) {
-                    inputText += event.text.text[0];
+                if (inputText.length() < 12) {
+                    inputText += event.text.text;
                 }
             }
         }
@@ -69,14 +75,13 @@ public:
     inline int GetMouseX() const { return mouseX; }
     inline int GetMouseY() const { return mouseY; }
     inline bool GetLeftClick() const { return leftClick; }
-
     inline bool GetEvent(Sint32 input, KeyState inputValue) {
         if (keyReference.find(input) == keyReference.end()) return false;
         return keyReference[input] == inputValue;
     }
-
     inline std::string GetInputText() const { return inputText; }
     inline void ClearInputText() { inputText = ""; }
+    inline bool GetEnterPressed() const { return enterPressed; }
     inline void StartTextInput() { SDL_StartTextInput(); }
     inline void StopTextInput() { SDL_StopTextInput(); }
 };

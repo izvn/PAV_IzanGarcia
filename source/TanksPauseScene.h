@@ -7,6 +7,7 @@
 #include "InputManager.h"
 #include <SDL_ttf.h>
 #include "GameConfig.h" 
+#include "TanksGameplay.h"
 
 class TanksPauseScene : public Scene
 {
@@ -46,6 +47,8 @@ public:
     {
         if (Input.GetEvent(SDLK_ESCAPE, DOWN))
         {
+            TanksGameplay* g = dynamic_cast<TanksGameplay*>(SM.GetScene("Tanks"));
+            if (g) g->ForceCleanup();
             SM.SetNextScene("MainMenu");
             return;
         }
@@ -54,7 +57,7 @@ public:
 
         if (btnResume && btnResume->IsClicked())
         {
-            SM.SetNextScene("Tanks"); 
+            SM.SetNextScene("Tanks");
             return;
         }
     }

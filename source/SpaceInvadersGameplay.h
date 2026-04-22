@@ -51,8 +51,14 @@ public:
     {
     }
 
+    void ForceCleanup() {
+        paused = false;
+        Scene::OnExit();
+    }
+
     void OnEnter() override {
         if (paused) {
+            paused = false;
             return;
         }
 

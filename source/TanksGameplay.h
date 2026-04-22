@@ -63,9 +63,15 @@ public:
     {
     }
 
+    void ForceCleanup() {
+        paused = false;
+        Scene::OnExit();
+    }
+
     void OnEnter() override {
         if (paused)
         {
+            paused = false;
             return;
         }
 
@@ -210,7 +216,22 @@ private:
     }
 
     void SpawnEnemy(const EnemyInfo& ei) {
-        Vector2 pos = GetRandomPositionInsideGameArea();
+        Vector2 pos;
+        bool validPos = false;
+        int attempts = 0;
+        float safeRadius = 300.0f;
+
+        while (!validPos && attempts < 100) {
+            pos = GetRandomPositionInsideGameArea();
+            validPos = true;
+            if (player) {
+                float dx = pos.x - player->GetTransform()->position.x;
+                float dy = pos.y - player->GetTransform()->position.y;
+                float dist = sqrt(dx * dx + dy * dy);
+                if (dist < safeRadius) validPos = false;
+            }
+            attempts++;
+        }
 
         Enemy* newEnemy = nullptr;
         if (ei.type == "BasicEnemyTanks") {
@@ -238,8 +259,8 @@ private:
     Vector2 GetRandomPositionInsideGameArea() {
         int padding = 64;
         return Vector2(
-            padding + rand() % (RM.WINDOW_WIDTH - 2 * padding),
-            padding + rand() % (RM.WINDOW_HEIGHT - 2 * padding)
+            (float)(padding + rand() % (RM.WINDOW_WIDTH - 2 * padding)),
+            (float)(padding + rand() % (RM.WINDOW_HEIGHT - 2 * padding))
         );
     }
 

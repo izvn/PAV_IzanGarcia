@@ -7,6 +7,7 @@
 #include "InputManager.h"
 #include <SDL_ttf.h>
 #include "GameConfig.h"
+#include "SplatGameplay.h"
 
 class SplatPauseScene : public Scene
 {
@@ -46,6 +47,8 @@ public:
     {
         if (Input.GetEvent(SDLK_ESCAPE, DOWN))
         {
+            SplatGameplay* g = dynamic_cast<SplatGameplay*>(SM.GetScene("Splat"));
+            if (g) g->ForceCleanup();
             SM.SetNextScene("MainMenu");
             return;
         }

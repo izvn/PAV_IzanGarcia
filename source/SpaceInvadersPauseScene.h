@@ -7,6 +7,7 @@
 #include "InputManager.h"
 #include <SDL_ttf.h>
 #include "GameConfig.h"
+#include "SpaceInvadersGameplay.h"
 
 class SpaceInvadersPauseScene : public Scene
 {
@@ -46,6 +47,8 @@ public:
     {
         if (Input.GetEvent(SDLK_ESCAPE, DOWN))
         {
+            SpaceInvadersGameplay* g = dynamic_cast<SpaceInvadersGameplay*>(SM.GetScene("SpaceInvaders"));
+            if (g) g->ForceCleanup();
             SM.SetNextScene("MainMenu");
             return;
         }
