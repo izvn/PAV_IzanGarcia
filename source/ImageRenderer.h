@@ -33,6 +33,6 @@ public:
             SDL_Log("No texture found for %s\n", targetPath.c_str());
             return;
         }
-        SDL_RenderCopy(RM.GetRenderer(), tex, &sourceRect, &destRect);
+        SDL_RenderCopyEx(RM.GetRenderer(), tex, &sourceRect, &destRect, transform->rotation, nullptr, SDL_FLIP_NONE);
     }
 };

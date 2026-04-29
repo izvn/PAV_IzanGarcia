@@ -43,6 +43,8 @@ void Game::Init() {
 
     RM.LoadTexture("resources/player.png");
     RM.LoadTexture("resources/player_tank.png");
+    RM.LoadTexture("resources/tank_base.png");
+    RM.LoadTexture("resources/tank_turret.png");
     RM.LoadTexture("resources/player_swat.png");
     RM.LoadTexture("resources/bullet.png");
     RM.LoadTexture("resources/bullet_enemy.png");
