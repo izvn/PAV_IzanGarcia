@@ -194,5 +194,20 @@
     <ClInclude Include="source\GameOverScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\AsteroidsPlayerBullet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\AsteroidsEnemy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\AsteroidsPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\AsteroidsGameplay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\AsteroidsPauseScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

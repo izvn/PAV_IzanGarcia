@@ -12,6 +12,8 @@
 #include "SpaceInvadersPauseScene.h"
 #include "TanksPauseScene.h"
 #include "SplatPauseScene.h"
+#include "AsteroidsGameplay.h"
+#include "AsteroidsPauseScene.h"
 #include "GameOverScene.h"
 
 void Game::Init() {
@@ -105,9 +107,11 @@ void Game::Init() {
     SM.AddScene("SpaceInvaders", new SpaceInvadersGameplay());
     SM.AddScene("Tanks", new TanksGameplay());
     SM.AddScene("Splat", new SplatGameplay());
+    SM.AddScene("Asteroids", new AsteroidsGameplay());
     SM.AddScene("SpaceInvadersPause", new SpaceInvadersPauseScene());
     SM.AddScene("TanksPause", new TanksPauseScene());
     SM.AddScene("SplatPause", new SplatPauseScene());
+    SM.AddScene("AsteroidsPause", new AsteroidsPauseScene());
     SM.AddScene("GameOver", new GameOverScene());
 
     SM.InitFirstScene("SplashScreen");

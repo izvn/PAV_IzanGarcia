@@ -28,6 +28,11 @@
     <ClInclude Include="source\AABB.h" />
     <ClInclude Include="source\AimingEnemy.h" />
     <ClInclude Include="source\AnimatedImageRenderer.h" />
+    <ClInclude Include="source\AsteroidsEnemy.h" />
+    <ClInclude Include="source\AsteroidsGameplay.h" />
+    <ClInclude Include="source\AsteroidsPauseScene.h" />
+    <ClInclude Include="source\AsteroidsPlayer.h" />
+    <ClInclude Include="source\AsteroidsPlayerBullet.h" />
     <ClInclude Include="source\AudioManager.h" />
     <ClInclude Include="source\BasicEnemy.h" />
     <ClInclude Include="source\BasicEnemyTanks.h" />

@@ -20,6 +20,7 @@ private:
     ScoreRecord spaceScores[10];
     ScoreRecord tanksScores[10];
     ScoreRecord splatScores[10];
+    ScoreRecord asteroidsScores[10];
 
     Button* btnBack;
 
@@ -30,9 +31,11 @@ private:
     SDL_Texture* spaceTitleTex;
     SDL_Texture* tanksTitleTex;
     SDL_Texture* splatTitleTex;
+    SDL_Texture* asteroidsTitleTex;
     int spaceTitleW, spaceTitleH;
     int tanksTitleW, tanksTitleH;
     int splatTitleW, splatTitleH;
+    int asteroidsTitleW, asteroidsTitleH;
 
     SDL_Texture* backgroundTexture;
 
@@ -41,8 +44,8 @@ public:
         : btnBack(nullptr),
         fontTitle(nullptr),
         titleTexture(nullptr), titleW(0), titleH(0),
-        spaceTitleTex(nullptr), tanksTitleTex(nullptr), splatTitleTex(nullptr),
-        spaceTitleW(0), spaceTitleH(0), tanksTitleW(0), tanksTitleH(0), splatTitleW(0), splatTitleH(0),
+        spaceTitleTex(nullptr), tanksTitleTex(nullptr), splatTitleTex(nullptr), asteroidsTitleTex(nullptr),
+        spaceTitleW(0), spaceTitleH(0), tanksTitleW(0), tanksTitleH(0), splatTitleW(0), splatTitleH(0), asteroidsTitleW(0), asteroidsTitleH(0),
         backgroundTexture(nullptr)
     {
         for (int i = 0; i < 10; i++) {
@@ -52,6 +55,8 @@ public:
             tanksScores[i].score = 0;
             strcpy_s(splatScores[i].name, sizeof(splatScores[i].name), "---");
             splatScores[i].score = 0;
+            strcpy_s(asteroidsScores[i].name, sizeof(asteroidsScores[i].name), "---");
+            asteroidsScores[i].score = 0;
         }
     }
 
@@ -62,9 +67,10 @@ public:
         fontTitle = RM.GetFont("resources/fonts/fuente.otf");
 
         titleTexture = CreateTextTexture("RANKING", fontTitle, &titleW, &titleH);
-        spaceTitleTex = CreateTextTexture("SpaceInvaders", fontTitle, &spaceTitleW, &spaceTitleH);
+        spaceTitleTex = CreateTextTexture("SpaceInv", fontTitle, &spaceTitleW, &spaceTitleH);
         tanksTitleTex = CreateTextTexture("Tanks", fontTitle, &tanksTitleW, &tanksTitleH);
         splatTitleTex = CreateTextTexture("Splat!", fontTitle, &splatTitleW, &splatTitleH);
+        asteroidsTitleTex = CreateTextTexture("Asteroids", fontTitle, &asteroidsTitleW, &asteroidsTitleH);
 
         LoadScoresFromFile();
 
@@ -80,6 +86,7 @@ public:
         if (spaceTitleTex) SDL_DestroyTexture(spaceTitleTex);
         if (tanksTitleTex) SDL_DestroyTexture(tanksTitleTex);
         if (splatTitleTex) SDL_DestroyTexture(splatTitleTex);
+        if (asteroidsTitleTex) SDL_DestroyTexture(asteroidsTitleTex);
         if (btnBack) {
             delete btnBack;
             btnBack = nullptr;
@@ -99,20 +106,23 @@ public:
 
         RenderTexture(titleTexture, (1360 - titleW) / 2, 20, titleW, titleH);
 
-        int col1x = 200;
-        int col2x = 600;
-        int col3x = 1000;
+        int col1x = 100;
+        int col2x = 420;
+        int col3x = 740;
+        int col4x = 1060;
         int topY = 100;
 
         RenderTexture(spaceTitleTex, col1x, topY, spaceTitleW, spaceTitleH);
         RenderTexture(tanksTitleTex, col2x, topY, tanksTitleW, tanksTitleH);
         RenderTexture(splatTitleTex, col3x, topY, splatTitleW, splatTitleH);
+        RenderTexture(asteroidsTitleTex, col4x, topY, asteroidsTitleW, asteroidsTitleH);
 
         int rowY = topY + 60;
         for (int i = 0; i < 10; i++) {
             RenderScore(spaceScores[i], col1x, rowY + i * 40);
             RenderScore(tanksScores[i], col2x, rowY + i * 40);
             RenderScore(splatScores[i], col3x, rowY + i * 40);
+            RenderScore(asteroidsScores[i], col4x, rowY + i * 40);
         }
 
         btnBack->Render();
@@ -124,6 +134,7 @@ public:
         if (mode == 0) arr = spaceScores;
         else if (mode == 1) arr = tanksScores;
         else if (mode == 2) arr = splatScores;
+        else if (mode == 3) arr = asteroidsScores;
 
         std::vector<ScoreRecord> temp(arr, arr + 10);
         ScoreRecord newRecord;
@@ -151,20 +162,31 @@ public:
 
 private:
     void LoadScoresFromFile() {
-        std::ifstream file("resources/highscores_v2.bin", std::ios::binary);
-        if (!file.is_open()) return;
+        std::ifstream file("resources/highscores_v3.bin", std::ios::binary);
+        if (!file.is_open()) {
+            std::ifstream fileOld("resources/highscores_v2.bin", std::ios::binary);
+            if (fileOld.is_open()) {
+                fileOld.read(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
+                fileOld.read(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
+                fileOld.read(reinterpret_cast<char*>(splatScores), sizeof(splatScores));
+                fileOld.close();
+            }
+            return;
+        }
         file.read(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
         file.read(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
         file.read(reinterpret_cast<char*>(splatScores), sizeof(splatScores));
+        file.read(reinterpret_cast<char*>(asteroidsScores), sizeof(asteroidsScores));
         file.close();
     }
 
     void SaveScoresToFile() {
-        std::ofstream file("resources/highscores_v2.bin", std::ios::binary | std::ios::trunc);
+        std::ofstream file("resources/highscores_v3.bin", std::ios::binary | std::ios::trunc);
         if (!file.is_open()) return;
         file.write(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
         file.write(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
         file.write(reinterpret_cast<char*>(splatScores), sizeof(splatScores));
+        file.write(reinterpret_cast<char*>(asteroidsScores), sizeof(asteroidsScores));
         file.close();
     }
 

@@ -44,14 +44,15 @@ public:
 
         AM.PlaySong("menu_music");
 
-        buttons.push_back(new Button("Space Invaders", 200, 100, 200, 40, font));
-        buttons.push_back(new Button("Tanks", 200, 150, 200, 40, font));
+        buttons.push_back(new Button("Space Invaders", 200, 80, 200, 40, font));
+        buttons.push_back(new Button("Tanks", 200, 140, 200, 40, font));
         buttons.push_back(new Button("Splat!", 200, 200, 200, 40, font));
-        buttons.push_back(new Button("Select Sprites", 200, 300, 200, 40, font));
-        buttons.push_back(new Button("Check Ranking", 200, 350, 200, 40, font));
+        buttons.push_back(new Button("Asteroids", 200, 260, 200, 40, font));
+        buttons.push_back(new Button("Select Sprites", 200, 320, 200, 40, font));
+        buttons.push_back(new Button("Check Ranking", 200, 380, 200, 40, font));
         std::string audioLabel = AM.GetMuted() ? "Audio Disabled" : "Audio Enabled";
-        buttons.push_back(new Button(audioLabel, 200, 400, 200, 40, font));
-        buttons.push_back(new Button("Exit", 200, 450, 200, 40, font));
+        buttons.push_back(new Button(audioLabel, 200, 440, 200, 40, font));
+        buttons.push_back(new Button("Exit", 200, 500, 200, 40, font));
     }
 
     void OnExit() override {
@@ -104,6 +105,9 @@ public:
         }
         else if (label == "Splat!") {
             PrepareSceneChange("Splat");
+        }
+        else if (label == "Asteroids") {
+            PrepareSceneChange("Asteroids");
         }
         else if (label == "Select Sprites") {
             PrepareSceneChange("SpriteSelector");
