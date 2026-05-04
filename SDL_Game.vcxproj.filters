@@ -224,5 +224,17 @@
     <ClInclude Include="source\BreakoutPauseScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\FroggerPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FroggerEnemy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FroggerGameplay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\FroggerPauseScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

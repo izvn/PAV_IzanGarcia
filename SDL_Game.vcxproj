@@ -48,6 +48,10 @@
     <ClInclude Include="source\EnemyBullet.h" />
     <ClInclude Include="source\ExplodingEnemy.h" />
     <ClInclude Include="source\ExplosionEffect.h" />
+    <ClInclude Include="source\FroggerEnemy.h" />
+    <ClInclude Include="source\FroggerGameplay.h" />
+    <ClInclude Include="source\FroggerPauseScene.h" />
+    <ClInclude Include="source\FroggerPlayer.h" />
     <ClInclude Include="source\Game.h" />
     <ClInclude Include="source\GameConfig.h" />
     <ClInclude Include="source\GameObject.h" />

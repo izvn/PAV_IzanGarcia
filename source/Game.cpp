@@ -16,6 +16,8 @@
 #include "AsteroidsPauseScene.h"
 #include "BreakoutGameplay.h"
 #include "BreakoutPauseScene.h"
+#include "FroggerGameplay.h"
+#include "FroggerPauseScene.h"
 #include "GameOverScene.h"
 
 void Game::Init() {
@@ -111,11 +113,13 @@ void Game::Init() {
     SM.AddScene("Splat", new SplatGameplay());
     SM.AddScene("Asteroids", new AsteroidsGameplay());
     SM.AddScene("Breakout", new BreakoutGameplay());
+    SM.AddScene("Frogger", new FroggerGameplay());
     SM.AddScene("SpaceInvadersPause", new SpaceInvadersPauseScene());
     SM.AddScene("TanksPause", new TanksPauseScene());
     SM.AddScene("SplatPause", new SplatPauseScene());
     SM.AddScene("AsteroidsPause", new AsteroidsPauseScene());
     SM.AddScene("BreakoutPause", new BreakoutPauseScene());
+    SM.AddScene("FroggerPause", new FroggerPauseScene());
     SM.AddScene("GameOver", new GameOverScene());
 
     SM.InitFirstScene("SplashScreen");

@@ -44,15 +44,16 @@ public:
 
         AM.PlaySong("menu_music");
 
-        buttons.push_back(new Button("Space Invaders", 200, 60, 200, 40, font));
-        buttons.push_back(new Button("Tanks", 200, 115, 200, 40, font));
-        buttons.push_back(new Button("Splat!", 200, 170, 200, 40, font));
-        buttons.push_back(new Button("Asteroids", 200, 225, 200, 40, font));
-        buttons.push_back(new Button("Breakout", 200, 280, 200, 40, font));
-        buttons.push_back(new Button("Select Sprites", 200, 335, 200, 40, font));
-        buttons.push_back(new Button("Check Ranking", 200, 390, 200, 40, font));
+        buttons.push_back(new Button("Space Invaders", 200, 50, 200, 40, font));
+        buttons.push_back(new Button("Tanks", 200, 100, 200, 40, font));
+        buttons.push_back(new Button("Splat!", 200, 150, 200, 40, font));
+        buttons.push_back(new Button("Asteroids", 200, 200, 200, 40, font));
+        buttons.push_back(new Button("Breakout", 200, 250, 200, 40, font));
+        buttons.push_back(new Button("Frogger", 200, 300, 200, 40, font));
+        buttons.push_back(new Button("Select Sprites", 200, 350, 200, 40, font));
+        buttons.push_back(new Button("Check Ranking", 200, 400, 200, 40, font));
         std::string audioLabel = AM.GetMuted() ? "Audio Disabled" : "Audio Enabled";
-        buttons.push_back(new Button(audioLabel, 200, 445, 200, 40, font));
+        buttons.push_back(new Button(audioLabel, 200, 450, 200, 40, font));
         buttons.push_back(new Button("Exit", 200, 500, 200, 40, font));
     }
 
@@ -112,6 +113,9 @@ public:
         }
         else if (label == "Breakout") {
             PrepareSceneChange("Breakout");
+        }
+        else if (label == "Frogger") {
+            PrepareSceneChange("Frogger");
         }
         else if (label == "Select Sprites") {
             PrepareSceneChange("SpriteSelector");
