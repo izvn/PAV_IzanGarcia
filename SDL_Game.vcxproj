@@ -36,6 +36,11 @@
     <ClInclude Include="source\AudioManager.h" />
     <ClInclude Include="source\BasicEnemy.h" />
     <ClInclude Include="source\BasicEnemyTanks.h" />
+    <ClInclude Include="source\BreakoutBall.h" />
+    <ClInclude Include="source\BreakoutBrick.h" />
+    <ClInclude Include="source\BreakoutGameplay.h" />
+    <ClInclude Include="source\BreakoutPauseScene.h" />
+    <ClInclude Include="source\BreakoutPlayer.h" />
     <ClInclude Include="source\Bullet.h" />
     <ClInclude Include="source\BulletAimingEnemy.h" />
     <ClInclude Include="source\Button.h" />

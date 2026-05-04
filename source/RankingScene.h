@@ -21,6 +21,7 @@ private:
     ScoreRecord tanksScores[10];
     ScoreRecord splatScores[10];
     ScoreRecord asteroidsScores[10];
+    ScoreRecord breakoutScores[10];
 
     Button* btnBack;
 
@@ -32,10 +33,13 @@ private:
     SDL_Texture* tanksTitleTex;
     SDL_Texture* splatTitleTex;
     SDL_Texture* asteroidsTitleTex;
+    SDL_Texture* breakoutTitleTex;
+
     int spaceTitleW, spaceTitleH;
     int tanksTitleW, tanksTitleH;
     int splatTitleW, splatTitleH;
     int asteroidsTitleW, asteroidsTitleH;
+    int breakoutTitleW, breakoutTitleH;
 
     SDL_Texture* backgroundTexture;
 
@@ -44,8 +48,8 @@ public:
         : btnBack(nullptr),
         fontTitle(nullptr),
         titleTexture(nullptr), titleW(0), titleH(0),
-        spaceTitleTex(nullptr), tanksTitleTex(nullptr), splatTitleTex(nullptr), asteroidsTitleTex(nullptr),
-        spaceTitleW(0), spaceTitleH(0), tanksTitleW(0), tanksTitleH(0), splatTitleW(0), splatTitleH(0), asteroidsTitleW(0), asteroidsTitleH(0),
+        spaceTitleTex(nullptr), tanksTitleTex(nullptr), splatTitleTex(nullptr), asteroidsTitleTex(nullptr), breakoutTitleTex(nullptr),
+        spaceTitleW(0), spaceTitleH(0), tanksTitleW(0), tanksTitleH(0), splatTitleW(0), splatTitleH(0), asteroidsTitleW(0), asteroidsTitleH(0), breakoutTitleW(0), breakoutTitleH(0),
         backgroundTexture(nullptr)
     {
         for (int i = 0; i < 10; i++) {
@@ -57,13 +61,15 @@ public:
             splatScores[i].score = 0;
             strcpy_s(asteroidsScores[i].name, sizeof(asteroidsScores[i].name), "---");
             asteroidsScores[i].score = 0;
+            strcpy_s(breakoutScores[i].name, sizeof(breakoutScores[i].name), "---");
+            breakoutScores[i].score = 0;
         }
     }
 
     void OnEnter() override {
         backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
 
-        RM.LoadFont("resources/fonts/fuente.otf", 36);
+        RM.LoadFont("resources/fonts/fuente.otf", 30);
         fontTitle = RM.GetFont("resources/fonts/fuente.otf");
 
         titleTexture = CreateTextTexture("RANKING", fontTitle, &titleW, &titleH);
@@ -71,12 +77,13 @@ public:
         tanksTitleTex = CreateTextTexture("Tanks", fontTitle, &tanksTitleW, &tanksTitleH);
         splatTitleTex = CreateTextTexture("Splat!", fontTitle, &splatTitleW, &splatTitleH);
         asteroidsTitleTex = CreateTextTexture("Asteroids", fontTitle, &asteroidsTitleW, &asteroidsTitleH);
+        breakoutTitleTex = CreateTextTexture("Breakout", fontTitle, &breakoutTitleW, &breakoutTitleH);
 
         LoadScoresFromFile();
 
         RM.LoadFont("resources/fonts/fuente.otf", 28);
         TTF_Font* fontButton = RM.GetFont("resources/fonts/fuente.otf");
-        btnBack = new Button("Back", 600, 650, 200, 50, fontButton);
+        btnBack = new Button("Back", 600, 680, 200, 50, fontButton);
     }
 
     void OnExit() override {
@@ -87,6 +94,7 @@ public:
         if (tanksTitleTex) SDL_DestroyTexture(tanksTitleTex);
         if (splatTitleTex) SDL_DestroyTexture(splatTitleTex);
         if (asteroidsTitleTex) SDL_DestroyTexture(asteroidsTitleTex);
+        if (breakoutTitleTex) SDL_DestroyTexture(breakoutTitleTex);
         if (btnBack) {
             delete btnBack;
             btnBack = nullptr;
@@ -106,23 +114,26 @@ public:
 
         RenderTexture(titleTexture, (1360 - titleW) / 2, 20, titleW, titleH);
 
-        int col1x = 100;
-        int col2x = 420;
-        int col3x = 740;
-        int col4x = 1060;
+        int col1x = 40;
+        int col2x = 300;
+        int col3x = 560;
+        int col4x = 820;
+        int col5x = 1080;
         int topY = 100;
 
         RenderTexture(spaceTitleTex, col1x, topY, spaceTitleW, spaceTitleH);
         RenderTexture(tanksTitleTex, col2x, topY, tanksTitleW, tanksTitleH);
         RenderTexture(splatTitleTex, col3x, topY, splatTitleW, splatTitleH);
         RenderTexture(asteroidsTitleTex, col4x, topY, asteroidsTitleW, asteroidsTitleH);
+        RenderTexture(breakoutTitleTex, col5x, topY, breakoutTitleW, breakoutTitleH);
 
-        int rowY = topY + 60;
+        int rowY = topY + 50;
         for (int i = 0; i < 10; i++) {
             RenderScore(spaceScores[i], col1x, rowY + i * 40);
             RenderScore(tanksScores[i], col2x, rowY + i * 40);
             RenderScore(splatScores[i], col3x, rowY + i * 40);
             RenderScore(asteroidsScores[i], col4x, rowY + i * 40);
+            RenderScore(breakoutScores[i], col5x, rowY + i * 40);
         }
 
         btnBack->Render();
@@ -135,6 +146,7 @@ public:
         else if (mode == 1) arr = tanksScores;
         else if (mode == 2) arr = splatScores;
         else if (mode == 3) arr = asteroidsScores;
+        else if (mode == 4) arr = breakoutScores;
 
         std::vector<ScoreRecord> temp(arr, arr + 10);
         ScoreRecord newRecord;
@@ -162,13 +174,14 @@ public:
 
 private:
     void LoadScoresFromFile() {
-        std::ifstream file("resources/highscores_v3.bin", std::ios::binary);
+        std::ifstream file("resources/highscores_v4.bin", std::ios::binary);
         if (!file.is_open()) {
-            std::ifstream fileOld("resources/highscores_v2.bin", std::ios::binary);
+            std::ifstream fileOld("resources/highscores_v3.bin", std::ios::binary);
             if (fileOld.is_open()) {
                 fileOld.read(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
                 fileOld.read(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
                 fileOld.read(reinterpret_cast<char*>(splatScores), sizeof(splatScores));
+                fileOld.read(reinterpret_cast<char*>(asteroidsScores), sizeof(asteroidsScores));
                 fileOld.close();
             }
             return;
@@ -177,16 +190,18 @@ private:
         file.read(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
         file.read(reinterpret_cast<char*>(splatScores), sizeof(splatScores));
         file.read(reinterpret_cast<char*>(asteroidsScores), sizeof(asteroidsScores));
+        file.read(reinterpret_cast<char*>(breakoutScores), sizeof(breakoutScores));
         file.close();
     }
 
     void SaveScoresToFile() {
-        std::ofstream file("resources/highscores_v3.bin", std::ios::binary | std::ios::trunc);
+        std::ofstream file("resources/highscores_v4.bin", std::ios::binary | std::ios::trunc);
         if (!file.is_open()) return;
         file.write(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
         file.write(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
         file.write(reinterpret_cast<char*>(splatScores), sizeof(splatScores));
         file.write(reinterpret_cast<char*>(asteroidsScores), sizeof(asteroidsScores));
+        file.write(reinterpret_cast<char*>(breakoutScores), sizeof(breakoutScores));
         file.close();
     }
 
