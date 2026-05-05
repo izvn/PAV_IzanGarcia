@@ -19,10 +19,13 @@ private:
     SDL_Texture* titleTex = nullptr;
     SDL_Texture* instructionTex = nullptr;
     SDL_Texture* scoreTex = nullptr;
+    SDL_Texture* usernameTex = nullptr;
 
     int titleW, titleH;
     int instW, instH;
     int scoreW, scoreH;
+    int usernameW, usernameH;
+
 
     float cursorTimer = 0.0f;
     bool showCursor = true;
@@ -71,6 +74,9 @@ public:
             cursorTimer = 0.0f;
         }
 
+        usernameTex = CreateTextTexture(Input.GetInputText(), fontNormal, &usernameW, &usernameH);
+
+
         if (Input.GetEvent(SDLK_RETURN, DOWN) || Input.GetEvent(SDLK_KP_ENTER, DOWN))
         {
             RankingScene::InsertScoreForMode(GameConfig::pendingMode, Input.GetInputText(), GameConfig::pendingScore);
@@ -89,9 +95,7 @@ public:
         RenderTexture(titleTex, (RM.WINDOW_WIDTH - titleW) / 2, 100, titleW, titleH);
         RenderTexture(scoreTex, (RM.WINDOW_WIDTH - scoreW) / 2, 200, scoreW, scoreH);
 
-        std::string currentInput = "Enter Name: " + Input.GetInputText() + (showCursor ? "_" : " ");
-        int inputW, inputH;
-        SDL_Texture* inputTex = CreateTextTexture(currentInput, fontNormal, &inputW, &inputH);
+     
 
         SDL_Rect boxRect = { (RM.WINDOW_WIDTH - 400) / 2, 300, 400, 60 };
         SDL_SetRenderDrawColor(RM.GetRenderer(), 80, 80, 80, 255);
@@ -99,10 +103,8 @@ public:
         SDL_SetRenderDrawColor(RM.GetRenderer(), 255, 255, 255, 255);
         SDL_RenderDrawRect(RM.GetRenderer(), &boxRect);
 
-        if (inputTex) {
-            RenderTexture(inputTex, boxRect.x + 20, boxRect.y + (boxRect.h - inputH) / 2, inputW, inputH);
-            SDL_DestroyTexture(inputTex);
-        }
+       
+        RenderTexture(usernameTex, boxRect.x + 20, boxRect.y + (boxRect.h - usernameH) / 2, usernameW, usernameH);
 
         RenderTexture(instructionTex, (RM.WINDOW_WIDTH - instW) / 2, 450, instW, instH);
     }

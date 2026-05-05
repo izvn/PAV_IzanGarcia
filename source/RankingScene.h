@@ -23,6 +23,7 @@ private:
     ScoreRecord asteroidsScores[10];
     ScoreRecord breakoutScores[10];
     ScoreRecord froggerScores[10];
+    ScoreRecord arenaScores[10];
 
     Button* btnBack;
 
@@ -36,6 +37,7 @@ private:
     SDL_Texture* asteroidsTitleTex;
     SDL_Texture* breakoutTitleTex;
     SDL_Texture* froggerTitleTex;
+    SDL_Texture* arenaTitleTex;
 
     int spaceTitleW, spaceTitleH;
     int tanksTitleW, tanksTitleH;
@@ -43,6 +45,7 @@ private:
     int asteroidsTitleW, asteroidsTitleH;
     int breakoutTitleW, breakoutTitleH;
     int froggerTitleW, froggerTitleH;
+    int arenaTitleW, arenaTitleH;
 
     SDL_Texture* backgroundTexture;
 
@@ -51,8 +54,8 @@ public:
         : btnBack(nullptr),
         fontTitle(nullptr),
         titleTexture(nullptr), titleW(0), titleH(0),
-        spaceTitleTex(nullptr), tanksTitleTex(nullptr), splatTitleTex(nullptr), asteroidsTitleTex(nullptr), breakoutTitleTex(nullptr), froggerTitleTex(nullptr),
-        spaceTitleW(0), spaceTitleH(0), tanksTitleW(0), tanksTitleH(0), splatTitleW(0), splatTitleH(0), asteroidsTitleW(0), asteroidsTitleH(0), breakoutTitleW(0), breakoutTitleH(0), froggerTitleW(0), froggerTitleH(0),
+        spaceTitleTex(nullptr), tanksTitleTex(nullptr), splatTitleTex(nullptr), asteroidsTitleTex(nullptr), breakoutTitleTex(nullptr), froggerTitleTex(nullptr), arenaTitleTex(nullptr),
+        spaceTitleW(0), spaceTitleH(0), tanksTitleW(0), tanksTitleH(0), splatTitleW(0), splatTitleH(0), asteroidsTitleW(0), asteroidsTitleH(0), breakoutTitleW(0), breakoutTitleH(0), froggerTitleW(0), froggerTitleH(0), arenaTitleW(0), arenaTitleH(0),
         backgroundTexture(nullptr)
     {
         for (int i = 0; i < 10; i++) {
@@ -68,22 +71,25 @@ public:
             breakoutScores[i].score = 0;
             strcpy_s(froggerScores[i].name, sizeof(froggerScores[i].name), "---");
             froggerScores[i].score = 0;
+            strcpy_s(arenaScores[i].name, sizeof(arenaScores[i].name), "---");
+            arenaScores[i].score = 0;
         }
     }
 
     void OnEnter() override {
         backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
 
-        RM.LoadFont("resources/fonts/fuente.otf", 26);
+        RM.LoadFont("resources/fonts/fuente.otf", 24);
         fontTitle = RM.GetFont("resources/fonts/fuente.otf");
 
         titleTexture = CreateTextTexture("RANKING", fontTitle, &titleW, &titleH);
-        spaceTitleTex = CreateTextTexture("SpaceInv", fontTitle, &spaceTitleW, &spaceTitleH);
+        spaceTitleTex = CreateTextTexture("Space", fontTitle, &spaceTitleW, &spaceTitleH);
         tanksTitleTex = CreateTextTexture("Tanks", fontTitle, &tanksTitleW, &tanksTitleH);
-        splatTitleTex = CreateTextTexture("Splat!", fontTitle, &splatTitleW, &splatTitleH);
-        asteroidsTitleTex = CreateTextTexture("Asteroids", fontTitle, &asteroidsTitleW, &asteroidsTitleH);
+        splatTitleTex = CreateTextTexture("Splat", fontTitle, &splatTitleW, &splatTitleH);
+        asteroidsTitleTex = CreateTextTexture("Asteroid", fontTitle, &asteroidsTitleW, &asteroidsTitleH);
         breakoutTitleTex = CreateTextTexture("Breakout", fontTitle, &breakoutTitleW, &breakoutTitleH);
         froggerTitleTex = CreateTextTexture("Frogger", fontTitle, &froggerTitleW, &froggerTitleH);
+        arenaTitleTex = CreateTextTexture("Arena", fontTitle, &arenaTitleW, &arenaTitleH);
 
         LoadScoresFromFile();
 
@@ -102,6 +108,7 @@ public:
         if (asteroidsTitleTex) SDL_DestroyTexture(asteroidsTitleTex);
         if (breakoutTitleTex) SDL_DestroyTexture(breakoutTitleTex);
         if (froggerTitleTex) SDL_DestroyTexture(froggerTitleTex);
+        if (arenaTitleTex) SDL_DestroyTexture(arenaTitleTex);
         if (btnBack) {
             delete btnBack;
             btnBack = nullptr;
@@ -119,15 +126,16 @@ public:
     void Render() override {
         SDL_RenderCopy(RM.GetRenderer(), backgroundTexture, nullptr, nullptr);
 
-        RenderTexture(titleTexture, (1360 - titleW) / 2, 20, titleW, titleH);
+        RenderTexture(titleTexture, (1360 - titleW) / 2, 10, titleW, titleH);
 
         int col1x = 20;
-        int col2x = 240;
-        int col3x = 460;
-        int col4x = 680;
-        int col5x = 900;
-        int col6x = 1120;
-        int topY = 100;
+        int col2x = 210;
+        int col3x = 400;
+        int col4x = 590;
+        int col5x = 780;
+        int col6x = 970;
+        int col7x = 1160;
+        int topY = 80;
 
         RenderTexture(spaceTitleTex, col1x, topY, spaceTitleW, spaceTitleH);
         RenderTexture(tanksTitleTex, col2x, topY, tanksTitleW, tanksTitleH);
@@ -135,8 +143,9 @@ public:
         RenderTexture(asteroidsTitleTex, col4x, topY, asteroidsTitleW, asteroidsTitleH);
         RenderTexture(breakoutTitleTex, col5x, topY, breakoutTitleW, breakoutTitleH);
         RenderTexture(froggerTitleTex, col6x, topY, froggerTitleW, froggerTitleH);
+        RenderTexture(arenaTitleTex, col7x, topY, arenaTitleW, arenaTitleH);
 
-        int rowY = topY + 50;
+        int rowY = topY + 40;
         for (int i = 0; i < 10; i++) {
             RenderScore(spaceScores[i], col1x, rowY + i * 40);
             RenderScore(tanksScores[i], col2x, rowY + i * 40);
@@ -144,6 +153,7 @@ public:
             RenderScore(asteroidsScores[i], col4x, rowY + i * 40);
             RenderScore(breakoutScores[i], col5x, rowY + i * 40);
             RenderScore(froggerScores[i], col6x, rowY + i * 40);
+            RenderScore(arenaScores[i], col7x, rowY + i * 40);
         }
 
         btnBack->Render();
@@ -158,6 +168,7 @@ public:
         else if (mode == 3) arr = asteroidsScores;
         else if (mode == 4) arr = breakoutScores;
         else if (mode == 5) arr = froggerScores;
+        else if (mode == 6) arr = arenaScores;
 
         std::vector<ScoreRecord> temp(arr, arr + 10);
         ScoreRecord newRecord;
@@ -185,15 +196,16 @@ public:
 
 private:
     void LoadScoresFromFile() {
-        std::ifstream file("resources/highscores_v5.bin", std::ios::binary);
+        std::ifstream file("resources/highscores_v6.bin", std::ios::binary);
         if (!file.is_open()) {
-            std::ifstream fileOld("resources/highscores_v4.bin", std::ios::binary);
+            std::ifstream fileOld("resources/highscores_v5.bin", std::ios::binary);
             if (fileOld.is_open()) {
                 fileOld.read(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
                 fileOld.read(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
                 fileOld.read(reinterpret_cast<char*>(splatScores), sizeof(splatScores));
                 fileOld.read(reinterpret_cast<char*>(asteroidsScores), sizeof(asteroidsScores));
                 fileOld.read(reinterpret_cast<char*>(breakoutScores), sizeof(breakoutScores));
+                fileOld.read(reinterpret_cast<char*>(froggerScores), sizeof(froggerScores));
                 fileOld.close();
             }
             return;
@@ -204,11 +216,12 @@ private:
         file.read(reinterpret_cast<char*>(asteroidsScores), sizeof(asteroidsScores));
         file.read(reinterpret_cast<char*>(breakoutScores), sizeof(breakoutScores));
         file.read(reinterpret_cast<char*>(froggerScores), sizeof(froggerScores));
+        file.read(reinterpret_cast<char*>(arenaScores), sizeof(arenaScores));
         file.close();
     }
 
     void SaveScoresToFile() {
-        std::ofstream file("resources/highscores_v5.bin", std::ios::binary | std::ios::trunc);
+        std::ofstream file("resources/highscores_v6.bin", std::ios::binary | std::ios::trunc);
         if (!file.is_open()) return;
         file.write(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
         file.write(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
@@ -216,6 +229,7 @@ private:
         file.write(reinterpret_cast<char*>(asteroidsScores), sizeof(asteroidsScores));
         file.write(reinterpret_cast<char*>(breakoutScores), sizeof(breakoutScores));
         file.write(reinterpret_cast<char*>(froggerScores), sizeof(froggerScores));
+        file.write(reinterpret_cast<char*>(arenaScores), sizeof(arenaScores));
         file.close();
     }
 

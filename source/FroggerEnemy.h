@@ -15,7 +15,7 @@ public:
         speed(spd), direction(dir)
     {
         transform->position = pos;
-        transform->scale = Vector2(2.0f, 1.5f);
+        transform->scale = Vector2(1.5f, 1.5f);
         physics->SetVelocity(Vector2(speed * direction, 0));
 
         if (renderer) {

@@ -16,21 +16,13 @@ private:
     float maxShootTime;
 
     AnimatedImageRenderer* normalRenderer;
-    AnimatedImageRenderer* shootRenderer;
-
-    bool isShooting;
-    float shootAnimTimer;
-    const float shootAnimDuration = 0.4f;
 
 public:
     BasicEnemy(Vector2 pos)
-        : Enemy(GameConfig::GetEnemySkin("basicEnemy"), Vector2(0, 0), Vector2(32, 64)),
+        : Enemy(GameConfig::GetEnemySkin("enemy"), Vector2(0, 0), Vector2(32, 32)),
         moveSpeed(100.0f),
         direction(1.0f),
-        normalRenderer(nullptr),
-        shootRenderer(nullptr),
-        isShooting(false),
-        shootAnimTimer(0.0f)
+        normalRenderer(nullptr)
     {
         transform->position = pos;
         transform->scale = Vector2(1.5f, 1.5f);
@@ -46,24 +38,13 @@ public:
 
         normalRenderer = new AnimatedImageRenderer(
             transform,
-            GameConfig::GetEnemySkin("basicEnemy"),
+            GameConfig::GetEnemySkin("enemy"),
             Vector2(0, 0),
             32,
-            64,
+            32,
             2,
             0.5f,
             true
-        );
-
-        shootRenderer = new AnimatedImageRenderer(
-            transform,
-            GameConfig::GetShootAnimationSprite(),
-            Vector2(0, 0),
-            32,
-            64,
-            2,
-            0.2f,
-            false
         );
 
         renderer = normalRenderer;
@@ -71,25 +52,16 @@ public:
 
     ~BasicEnemy() override {
         if (renderer == normalRenderer) renderer = nullptr;
-        if (renderer == shootRenderer)  renderer = nullptr;
-
-        if (normalRenderer) { delete normalRenderer; normalRenderer = nullptr; }
-        if (shootRenderer) { delete shootRenderer;  shootRenderer = nullptr; }
+        if (normalRenderer) {
+            delete normalRenderer;
+            normalRenderer = nullptr;
+        }
     }
 
     void Update() override {
         Enemy::Update();
 
         float dt = TIME.GetDeltaTime();
-
-        if (isShooting) {
-            shootAnimTimer += dt;
-            if (shootAnimTimer >= shootAnimDuration) {
-                isShooting = false;
-                shootAnimTimer = 0.0f;
-                renderer = normalRenderer;
-            }
-        }
 
         transform->position.x += direction * moveSpeed * dt;
         if (transform->position.x < 100) {
@@ -111,10 +83,6 @@ public:
     }
 
     void Shoot() {
-        isShooting = true;
-        shootAnimTimer = 0.0f;
-        renderer = shootRenderer;
-
         Vector2 bulletPos = transform->position;
         bulletPos.y += (transform->size.y / 2) * transform->scale.y;
         SPAWN.SpawnObject(new EnemyBullet(bulletPos, Vector2(0, 1)));

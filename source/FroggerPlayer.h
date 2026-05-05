@@ -14,7 +14,7 @@ public:
         : Player("resources/player.png", Vector2(0, 0), Vector2(32, 32)),
         stepSize(64.0f)
     {
-        startPos = Vector2(RM.WINDOW_WIDTH / 2.0f, RM.WINDOW_HEIGHT - 64.0f);
+        startPos = Vector2(RM.WINDOW_WIDTH / 2.0f, RM.WINDOW_HEIGHT - 48.0f);
         transform->position = startPos;
         transform->scale = Vector2(1.5f, 1.5f);
 
@@ -53,9 +53,12 @@ public:
     }
 
     void ConfineToScreen() {
-        if (transform->position.x < 0) transform->position.x = 0;
-        if (transform->position.x > RM.WINDOW_WIDTH) transform->position.x = RM.WINDOW_WIDTH;
-        if (transform->position.y > RM.WINDOW_HEIGHT - 64.0f) transform->position.y = RM.WINDOW_HEIGHT - 64.0f;
+        float halfWidth = (transform->size.x * transform->scale.x) / 2.0f;
+        float halfHeight = (transform->size.y * transform->scale.y) / 2.0f;
+
+        if (transform->position.x - halfWidth < 0) transform->position.x = halfWidth;
+        if (transform->position.x + halfWidth > RM.WINDOW_WIDTH) transform->position.x = RM.WINDOW_WIDTH - halfWidth;
+        if (transform->position.y + halfHeight > RM.WINDOW_HEIGHT) transform->position.y = RM.WINDOW_HEIGHT - halfHeight;
     }
 
     void ResetPosition() {
@@ -63,4 +66,4 @@ public:
     }
 
     void Shoot() override {}
-};  
+};

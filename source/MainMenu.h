@@ -44,17 +44,18 @@ public:
 
         AM.PlaySong("menu_music");
 
-        buttons.push_back(new Button("Space Invaders", 200, 50, 200, 40, font));
-        buttons.push_back(new Button("Tanks", 200, 100, 200, 40, font));
-        buttons.push_back(new Button("Splat!", 200, 150, 200, 40, font));
-        buttons.push_back(new Button("Asteroids", 200, 200, 200, 40, font));
-        buttons.push_back(new Button("Breakout", 200, 250, 200, 40, font));
-        buttons.push_back(new Button("Frogger", 200, 300, 200, 40, font));
-        buttons.push_back(new Button("Select Sprites", 200, 350, 200, 40, font));
-        buttons.push_back(new Button("Check Ranking", 200, 400, 200, 40, font));
+        buttons.push_back(new Button("Space Invaders", 200, 40, 200, 40, font));
+        buttons.push_back(new Button("Tanks", 200, 90, 200, 40, font));
+        buttons.push_back(new Button("Splat!", 200, 140, 200, 40, font));
+        buttons.push_back(new Button("Asteroids", 200, 190, 200, 40, font));
+        buttons.push_back(new Button("Breakout", 200, 240, 200, 40, font));
+        buttons.push_back(new Button("Frogger", 200, 290, 200, 40, font));
+        buttons.push_back(new Button("Space Arena", 200, 340, 200, 40, font));
+        buttons.push_back(new Button("Select Sprites", 200, 390, 200, 40, font));
+        buttons.push_back(new Button("Check Ranking", 200, 440, 200, 40, font));
         std::string audioLabel = AM.GetMuted() ? "Audio Disabled" : "Audio Enabled";
-        buttons.push_back(new Button(audioLabel, 200, 450, 200, 40, font));
-        buttons.push_back(new Button("Exit", 200, 500, 200, 40, font));
+        buttons.push_back(new Button(audioLabel, 200, 490, 200, 40, font));
+        buttons.push_back(new Button("Exit", 200, 540, 200, 40, font));
     }
 
     void OnExit() override {
@@ -99,30 +100,15 @@ public:
     }
 
     void HandleButtonClick(const std::string& label, Button* button) {
-        if (label == "Space Invaders") {
-            PrepareSceneChange("SpaceInvaders");
-        }
-        else if (label == "Tanks") {
-            PrepareSceneChange("Tanks");
-        }
-        else if (label == "Splat!") {
-            PrepareSceneChange("Splat");
-        }
-        else if (label == "Asteroids") {
-            PrepareSceneChange("Asteroids");
-        }
-        else if (label == "Breakout") {
-            PrepareSceneChange("Breakout");
-        }
-        else if (label == "Frogger") {
-            PrepareSceneChange("Frogger");
-        }
-        else if (label == "Select Sprites") {
-            PrepareSceneChange("SpriteSelector");
-        }
-        else if (label == "Check Ranking") {
-            PrepareSceneChange("RankingScene");
-        }
+        if (label == "Space Invaders") PrepareSceneChange("SpaceInvaders");
+        else if (label == "Tanks") PrepareSceneChange("Tanks");
+        else if (label == "Splat!") PrepareSceneChange("Splat");
+        else if (label == "Asteroids") PrepareSceneChange("Asteroids");
+        else if (label == "Breakout") PrepareSceneChange("Breakout");
+        else if (label == "Frogger") PrepareSceneChange("Frogger");
+        else if (label == "Space Arena") PrepareSceneChange("Arena");
+        else if (label == "Select Sprites") PrepareSceneChange("SpriteSelector");
+        else if (label == "Check Ranking") PrepareSceneChange("RankingScene");
         else if (label == "Audio Enabled" || label == "Audio Disabled") {
             if (AM.GetMuted()) {
                 AM.Unmute();
