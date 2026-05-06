@@ -74,6 +74,11 @@
     <ClInclude Include="source\RenderManager.h" />
     <ClInclude Include="source\Scene.h" />
     <ClInclude Include="source\SceneManager.h" />
+    <ClInclude Include="source\ScrollerEnemy.h" />
+    <ClInclude Include="source\ScrollerGameplay.h" />
+    <ClInclude Include="source\ScrollerPauseScene.h" />
+    <ClInclude Include="source\ScrollerPlayer.h" />
+    <ClInclude Include="source\ScrollerPlayerBullet.h" />
     <ClInclude Include="source\SeekerEnemy.h" />
     <ClInclude Include="source\ShootingEnemy.h" />
     <ClInclude Include="source\SpaceInvadersBullet.h" />

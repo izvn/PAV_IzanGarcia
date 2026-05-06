@@ -44,18 +44,19 @@ public:
 
         AM.PlaySong("menu_music");
 
-        buttons.push_back(new Button("Space Invaders", 200, 40, 200, 40, font));
-        buttons.push_back(new Button("Tanks", 200, 90, 200, 40, font));
-        buttons.push_back(new Button("Splat!", 200, 140, 200, 40, font));
-        buttons.push_back(new Button("Asteroids", 200, 190, 200, 40, font));
-        buttons.push_back(new Button("Breakout", 200, 240, 200, 40, font));
-        buttons.push_back(new Button("Frogger", 200, 290, 200, 40, font));
-        buttons.push_back(new Button("Space Arena", 200, 340, 200, 40, font));
-        buttons.push_back(new Button("Select Sprites", 200, 390, 200, 40, font));
-        buttons.push_back(new Button("Check Ranking", 200, 440, 200, 40, font));
+        buttons.push_back(new Button("Space Invaders", 200, 30, 200, 40, font));
+        buttons.push_back(new Button("Tanks", 200, 80, 200, 40, font));
+        buttons.push_back(new Button("Splat!", 200, 130, 200, 40, font));
+        buttons.push_back(new Button("Asteroids", 200, 180, 200, 40, font));
+        buttons.push_back(new Button("Breakout", 200, 230, 200, 40, font));
+        buttons.push_back(new Button("Frogger", 200, 280, 200, 40, font));
+        buttons.push_back(new Button("Space Arena", 200, 330, 200, 40, font));
+        buttons.push_back(new Button("Scroller", 200, 380, 200, 40, font));
+        buttons.push_back(new Button("Select Sprites", 200, 430, 200, 40, font));
+        buttons.push_back(new Button("Check Ranking", 200, 480, 200, 40, font));
         std::string audioLabel = AM.GetMuted() ? "Audio Disabled" : "Audio Enabled";
-        buttons.push_back(new Button(audioLabel, 200, 490, 200, 40, font));
-        buttons.push_back(new Button("Exit", 200, 540, 200, 40, font));
+        buttons.push_back(new Button(audioLabel, 200, 530, 200, 40, font));
+        buttons.push_back(new Button("Exit", 200, 580, 200, 40, font));
     }
 
     void OnExit() override {
@@ -107,6 +108,7 @@ public:
         else if (label == "Breakout") PrepareSceneChange("Breakout");
         else if (label == "Frogger") PrepareSceneChange("Frogger");
         else if (label == "Space Arena") PrepareSceneChange("Arena");
+        else if (label == "Scroller") PrepareSceneChange("Scroller");
         else if (label == "Select Sprites") PrepareSceneChange("SpriteSelector");
         else if (label == "Check Ranking") PrepareSceneChange("RankingScene");
         else if (label == "Audio Enabled" || label == "Audio Disabled") {

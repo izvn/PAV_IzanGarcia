@@ -24,6 +24,7 @@ private:
     ScoreRecord breakoutScores[10];
     ScoreRecord froggerScores[10];
     ScoreRecord arenaScores[10];
+    ScoreRecord scrollerScores[10];
 
     Button* btnBack;
 
@@ -38,6 +39,7 @@ private:
     SDL_Texture* breakoutTitleTex;
     SDL_Texture* froggerTitleTex;
     SDL_Texture* arenaTitleTex;
+    SDL_Texture* scrollerTitleTex;
 
     int spaceTitleW, spaceTitleH;
     int tanksTitleW, tanksTitleH;
@@ -46,6 +48,7 @@ private:
     int breakoutTitleW, breakoutTitleH;
     int froggerTitleW, froggerTitleH;
     int arenaTitleW, arenaTitleH;
+    int scrollerTitleW, scrollerTitleH;
 
     SDL_Texture* backgroundTexture;
 
@@ -54,8 +57,8 @@ public:
         : btnBack(nullptr),
         fontTitle(nullptr),
         titleTexture(nullptr), titleW(0), titleH(0),
-        spaceTitleTex(nullptr), tanksTitleTex(nullptr), splatTitleTex(nullptr), asteroidsTitleTex(nullptr), breakoutTitleTex(nullptr), froggerTitleTex(nullptr), arenaTitleTex(nullptr),
-        spaceTitleW(0), spaceTitleH(0), tanksTitleW(0), tanksTitleH(0), splatTitleW(0), splatTitleH(0), asteroidsTitleW(0), asteroidsTitleH(0), breakoutTitleW(0), breakoutTitleH(0), froggerTitleW(0), froggerTitleH(0), arenaTitleW(0), arenaTitleH(0),
+        spaceTitleTex(nullptr), tanksTitleTex(nullptr), splatTitleTex(nullptr), asteroidsTitleTex(nullptr), breakoutTitleTex(nullptr), froggerTitleTex(nullptr), arenaTitleTex(nullptr), scrollerTitleTex(nullptr),
+        spaceTitleW(0), spaceTitleH(0), tanksTitleW(0), tanksTitleH(0), splatTitleW(0), splatTitleH(0), asteroidsTitleW(0), asteroidsTitleH(0), breakoutTitleW(0), breakoutTitleH(0), froggerTitleW(0), froggerTitleH(0), arenaTitleW(0), arenaTitleH(0), scrollerTitleW(0), scrollerTitleH(0),
         backgroundTexture(nullptr)
     {
         for (int i = 0; i < 10; i++) {
@@ -73,13 +76,15 @@ public:
             froggerScores[i].score = 0;
             strcpy_s(arenaScores[i].name, sizeof(arenaScores[i].name), "---");
             arenaScores[i].score = 0;
+            strcpy_s(scrollerScores[i].name, sizeof(scrollerScores[i].name), "---");
+            scrollerScores[i].score = 0;
         }
     }
 
     void OnEnter() override {
         backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
 
-        RM.LoadFont("resources/fonts/fuente.otf", 24);
+        RM.LoadFont("resources/fonts/fuente.otf", 22);
         fontTitle = RM.GetFont("resources/fonts/fuente.otf");
 
         titleTexture = CreateTextTexture("RANKING", fontTitle, &titleW, &titleH);
@@ -90,6 +95,7 @@ public:
         breakoutTitleTex = CreateTextTexture("Breakout", fontTitle, &breakoutTitleW, &breakoutTitleH);
         froggerTitleTex = CreateTextTexture("Frogger", fontTitle, &froggerTitleW, &froggerTitleH);
         arenaTitleTex = CreateTextTexture("Arena", fontTitle, &arenaTitleW, &arenaTitleH);
+        scrollerTitleTex = CreateTextTexture("Scroller", fontTitle, &scrollerTitleW, &scrollerTitleH);
 
         LoadScoresFromFile();
 
@@ -109,6 +115,7 @@ public:
         if (breakoutTitleTex) SDL_DestroyTexture(breakoutTitleTex);
         if (froggerTitleTex) SDL_DestroyTexture(froggerTitleTex);
         if (arenaTitleTex) SDL_DestroyTexture(arenaTitleTex);
+        if (scrollerTitleTex) SDL_DestroyTexture(scrollerTitleTex);
         if (btnBack) {
             delete btnBack;
             btnBack = nullptr;
@@ -129,13 +136,14 @@ public:
         RenderTexture(titleTexture, (1360 - titleW) / 2, 10, titleW, titleH);
 
         int col1x = 20;
-        int col2x = 210;
-        int col3x = 400;
-        int col4x = 590;
-        int col5x = 780;
-        int col6x = 970;
-        int col7x = 1160;
-        int topY = 80;
+        int col2x = 180;
+        int col3x = 340;
+        int col4x = 500;
+        int col5x = 660;
+        int col6x = 820;
+        int col7x = 980;
+        int col8x = 1140;
+        int topY = 70;
 
         RenderTexture(spaceTitleTex, col1x, topY, spaceTitleW, spaceTitleH);
         RenderTexture(tanksTitleTex, col2x, topY, tanksTitleW, tanksTitleH);
@@ -144,6 +152,7 @@ public:
         RenderTexture(breakoutTitleTex, col5x, topY, breakoutTitleW, breakoutTitleH);
         RenderTexture(froggerTitleTex, col6x, topY, froggerTitleW, froggerTitleH);
         RenderTexture(arenaTitleTex, col7x, topY, arenaTitleW, arenaTitleH);
+        RenderTexture(scrollerTitleTex, col8x, topY, scrollerTitleW, scrollerTitleH);
 
         int rowY = topY + 40;
         for (int i = 0; i < 10; i++) {
@@ -154,6 +163,7 @@ public:
             RenderScore(breakoutScores[i], col5x, rowY + i * 40);
             RenderScore(froggerScores[i], col6x, rowY + i * 40);
             RenderScore(arenaScores[i], col7x, rowY + i * 40);
+            RenderScore(scrollerScores[i], col8x, rowY + i * 40);
         }
 
         btnBack->Render();
@@ -169,6 +179,7 @@ public:
         else if (mode == 4) arr = breakoutScores;
         else if (mode == 5) arr = froggerScores;
         else if (mode == 6) arr = arenaScores;
+        else if (mode == 7) arr = scrollerScores;
 
         std::vector<ScoreRecord> temp(arr, arr + 10);
         ScoreRecord newRecord;
@@ -196,9 +207,9 @@ public:
 
 private:
     void LoadScoresFromFile() {
-        std::ifstream file("resources/highscores_v6.bin", std::ios::binary);
+        std::ifstream file("resources/highscores_v7.bin", std::ios::binary);
         if (!file.is_open()) {
-            std::ifstream fileOld("resources/highscores_v5.bin", std::ios::binary);
+            std::ifstream fileOld("resources/highscores_v6.bin", std::ios::binary);
             if (fileOld.is_open()) {
                 fileOld.read(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
                 fileOld.read(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
@@ -206,6 +217,7 @@ private:
                 fileOld.read(reinterpret_cast<char*>(asteroidsScores), sizeof(asteroidsScores));
                 fileOld.read(reinterpret_cast<char*>(breakoutScores), sizeof(breakoutScores));
                 fileOld.read(reinterpret_cast<char*>(froggerScores), sizeof(froggerScores));
+                fileOld.read(reinterpret_cast<char*>(arenaScores), sizeof(arenaScores));
                 fileOld.close();
             }
             return;
@@ -217,11 +229,12 @@ private:
         file.read(reinterpret_cast<char*>(breakoutScores), sizeof(breakoutScores));
         file.read(reinterpret_cast<char*>(froggerScores), sizeof(froggerScores));
         file.read(reinterpret_cast<char*>(arenaScores), sizeof(arenaScores));
+        file.read(reinterpret_cast<char*>(scrollerScores), sizeof(scrollerScores));
         file.close();
     }
 
     void SaveScoresToFile() {
-        std::ofstream file("resources/highscores_v6.bin", std::ios::binary | std::ios::trunc);
+        std::ofstream file("resources/highscores_v7.bin", std::ios::binary | std::ios::trunc);
         if (!file.is_open()) return;
         file.write(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
         file.write(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
@@ -230,6 +243,7 @@ private:
         file.write(reinterpret_cast<char*>(breakoutScores), sizeof(breakoutScores));
         file.write(reinterpret_cast<char*>(froggerScores), sizeof(froggerScores));
         file.write(reinterpret_cast<char*>(arenaScores), sizeof(arenaScores));
+        file.write(reinterpret_cast<char*>(scrollerScores), sizeof(scrollerScores));
         file.close();
     }
 
