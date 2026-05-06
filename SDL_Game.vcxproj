@@ -53,6 +53,10 @@
     <ClInclude Include="source\EnemyBullet.h" />
     <ClInclude Include="source\ExplodingEnemy.h" />
     <ClInclude Include="source\ExplosionEffect.h" />
+    <ClInclude Include="source\FlappyGameplay.h" />
+    <ClInclude Include="source\FlappyObstacle.h" />
+    <ClInclude Include="source\FlappyPauseScene.h" />
+    <ClInclude Include="source\FlappyPlayer.h" />
     <ClInclude Include="source\FroggerEnemy.h" />
     <ClInclude Include="source\FroggerGameplay.h" />
     <ClInclude Include="source\FroggerPauseScene.h" />

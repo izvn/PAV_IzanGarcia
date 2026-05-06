@@ -1,7 +1,7 @@
 #pragma once
 #include "Scene.h"
-#include "ScrollerPlayer.h"
-#include "ScrollerEnemy.h"
+#include "FlappyPlayer.h"
+#include "FlappyObstacle.h"
 #include "AudioManager.h"
 #include "RenderManager.h"
 #include "GameConfig.h"
@@ -12,33 +12,28 @@
 #include <vector>
 #include <cmath>
 
-class ScrollerGameplay : public Scene {
+class FlappyGameplay : public Scene {
 private:
-    ScrollerPlayer* player;
+    FlappyPlayer* player;
     bool gameOver;
 
     float spawnTimer;
     float spawnInterval;
-    int currentWave;
-    float waveTimer;
+    float pipeSpeed;
 
     SDL_Texture* backgroundTexture;
 
     int score;
     int highScore;
     TextObject* scoreText;
-    TextObject* livesText;
-    TextObject* waveText;
     TextObject* highScoreText;
 
     bool paused;
 
 public:
-    ScrollerGameplay()
-        : Scene(), player(nullptr), gameOver(false), spawnTimer(0), spawnInterval(1.5f),
-        currentWave(1), waveTimer(0), backgroundTexture(nullptr),
-        score(0), highScore(0), scoreText(nullptr), livesText(nullptr), waveText(nullptr),
-        highScoreText(nullptr), paused(false) {
+    FlappyGameplay()
+        : Scene(), player(nullptr), gameOver(false), spawnTimer(0), spawnInterval(2.0f), pipeSpeed(250.0f),
+        backgroundTexture(nullptr), score(0), highScore(0), scoreText(nullptr), highScoreText(nullptr), paused(false) {
     }
 
     void ForceCleanup() {
@@ -54,10 +49,9 @@ public:
 
         gameOver = false;
         score = 0;
-        currentWave = 1;
-        spawnInterval = 1.5f;
+        pipeSpeed = 250.0f;
+        spawnInterval = 2.0f;
         spawnTimer = 1.0f;
-        waveTimer = 0.0f;
 
         backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
         AM.StopMusic();
@@ -65,20 +59,12 @@ public:
 
         srand((unsigned)time(NULL));
 
-        player = new ScrollerPlayer();
+        player = new FlappyPlayer();
         SPAWN.SpawnObject(player);
 
         scoreText = new TextObject("", Vector2(0, 0), Vector2(150, 40), "SCORE: 000000");
         scoreText->GetTransform()->position = Vector2(120, 30);
         SPAWN.SpawnObject(scoreText);
-
-        livesText = new TextObject("", Vector2(0, 0), Vector2(150, 40), "Lives: 3");
-        livesText->GetTransform()->position = Vector2(500, 30);
-        SPAWN.SpawnObject(livesText);
-
-        waveText = new TextObject("", Vector2(0, 0), Vector2(150, 40), "WAVE: 1");
-        waveText->GetTransform()->position = Vector2(880, 30);
-        SPAWN.SpawnObject(waveText);
 
         highScoreText = new TextObject("", Vector2(0, 0), Vector2(200, 40), "High: 000000");
         highScoreText->GetTransform()->position = Vector2(1260, 30);
@@ -86,7 +72,7 @@ public:
     }
 
     void OnExit() override {
-        if (SM.GetNextSceneName() == "ScrollerPause") {
+        if (SM.GetNextSceneName() == "FlappyPause") {
             paused = true;
             return;
         }
@@ -96,39 +82,27 @@ public:
 
     void Update() override {
         if (!gameOver && Input.GetEvent(SDLK_ESCAPE, DOWN)) {
-            SM.SetNextScene("ScrollerPause");
+            SM.SetNextScene("FlappyPause");
             return;
         }
 
         UpdateHUD();
 
-        if (!gameOver) {
-            float dt = TIME.GetDeltaTime();
-            waveTimer += dt;
-            if (waveTimer >= 15.0f) {
-                waveTimer = 0.0f;
-                currentWave++;
-                spawnInterval = std::fmax(0.3f, spawnInterval - 0.15f);
-                AM.PlayClip("tank_end_wave", 0);
-            }
-
-            spawnTimer -= dt;
-            if (spawnTimer <= 0.0f) {
-                int enemiesToSpawn = 1 + (currentWave / 2);
-                for (int i = 0; i < enemiesToSpawn; i++) {
-                    SpawnEnemy();
+        if (player && player->HasStarted()) {
+            if (!gameOver) {
+                float dt = TIME.GetDeltaTime();
+                spawnTimer -= dt;
+                if (spawnTimer <= 0.0f) {
+                    SpawnPipes();
+                    spawnTimer = spawnInterval;
+                    pipeSpeed += 5.0f;
+                    spawnInterval = std::fmax(1.0f, spawnInterval - 0.02f);
                 }
-                spawnTimer = spawnInterval;
             }
         }
 
         for (int i = (int)objects.size() - 1; i >= 0; i--) {
             if (objects[i]->IsPendingDestroy()) {
-                if (Enemy* e = dynamic_cast<Enemy*>(objects[i])) {
-                    if (e->GetTransform()->position.x > -40.0f) {
-                        AddScore(50);
-                    }
-                }
                 delete objects[i];
                 objects.erase(objects.begin() + i);
             }
@@ -140,9 +114,19 @@ public:
 
         for (Object* o : objects) {
             o->Update();
+            if (player && !gameOver && player->HasStarted()) {
+                if (FlappyObstacle* obs = dynamic_cast<FlappyObstacle*>(o)) {
+                    if (obs->CheckPassed(player->GetTransform()->position.x)) {
+                        AddScore(100);
+                        AM.PlayClip("space_invaders_end_wave", 0);
+                    }
+                }
+            }
         }
 
-        CheckCollisions();
+        if (player && player->HasStarted()) {
+            CheckCollisions();
+        }
 
         if (player && !player->IsAlive() && !gameOver) {
             EndGame();
@@ -159,24 +143,42 @@ public:
     }
 
 private:
-    void SpawnEnemy() {
-        float yPos = 80.0f + (rand() % (RM.WINDOW_HEIGHT - 160));
-        Vector2 pos((float)RM.WINDOW_WIDTH + 50.0f, yPos);
+    void SpawnPipes() {
+        float blockSize = 48.0f;
+        int totalBlocks = 17;
+        int gapSizeBlocks = 5;
 
-        float speed = 150.0f + (currentWave * 15.0f) + (rand() % 50);
-        float verticalRange = (rand() % 2 == 0) ? (float)(rand() % 150) : 0.0f;
+        int minGapStart = 2;
+        int maxGapStart = totalBlocks - gapSizeBlocks - 2;
+        int gapStart = minGapStart + (rand() % (maxGapStart - minGapStart + 1));
 
-        SPAWN.SpawnObject(new ScrollerEnemy(pos, speed, verticalRange));
+        float startX = (float)RM.WINDOW_WIDTH + 50.0f;
+        bool triggerAssigned = false;
+
+        for (int i = 0; i < totalBlocks; i++) {
+            if (i >= gapStart && i < gapStart + gapSizeBlocks) {
+                continue;
+            }
+
+            bool isTrigger = false;
+            if (!triggerAssigned && i >= gapStart + gapSizeBlocks) {
+                isTrigger = true;
+                triggerAssigned = true;
+            }
+
+            float rot = (i < gapStart) ? 180.0f : 0.0f;
+            Vector2 pos(startX, i * blockSize);
+
+            SPAWN.SpawnObject(new FlappyObstacle(pos, pipeSpeed, isTrigger, rot));
+        }
     }
 
     void CheckCollisions() {
-        for (int i = 0; i < (int)objects.size(); i++) {
-            for (int j = i + 1; j < (int)objects.size(); j++) {
-                Object* a = objects[i];
-                Object* b = objects[j];
-                if (a->GetRigidbody()->CheckCollision(b->GetRigidbody())) {
-                    a->OnCollisionEnter(b);
-                    b->OnCollisionEnter(a);
+        if (!player) return;
+        for (Object* o : objects) {
+            if (Enemy* enemy = dynamic_cast<Enemy*>(o)) {
+                if (player->GetRigidbody()->CheckCollision(enemy->GetRigidbody())) {
+                    player->OnCollisionEnter(enemy);
                 }
             }
         }
@@ -193,16 +195,6 @@ private:
             sprintf_s(buffer, "SCORE: %06d", score);
             scoreText->SetText(buffer);
         }
-        if (livesText && player) {
-            char buffer[64];
-            sprintf_s(buffer, "Lives: %d", player->GetLives());
-            livesText->SetText(buffer);
-        }
-        if (waveText) {
-            char buffer[64];
-            sprintf_s(buffer, "WAVE: %d", currentWave);
-            waveText->SetText(buffer);
-        }
         if (highScoreText) {
             char buffer[64];
             sprintf_s(buffer, "High: %06d", highScore);
@@ -211,9 +203,8 @@ private:
     }
 
     void EndGame() {
-        if (player) score += player->GetLives() * 5000;
         gameOver = true;
-        GameConfig::pendingMode = 7;
+        GameConfig::pendingMode = 8;
         GameConfig::pendingScore = score;
         SM.SetNextScene("GameOver");
     }

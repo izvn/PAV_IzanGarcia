@@ -22,6 +22,8 @@
 #include "ArenaPauseScene.h"
 #include "ScrollerGameplay.h"
 #include "ScrollerPauseScene.h"
+#include "FlappyGameplay.h"
+#include "FlappyPauseScene.h"
 #include "GameOverScene.h"
 
 void Game::Init() {
@@ -120,6 +122,7 @@ void Game::Init() {
     SM.AddScene("Frogger", new FroggerGameplay());
     SM.AddScene("Arena", new ArenaGameplay());
     SM.AddScene("Scroller", new ScrollerGameplay());
+    SM.AddScene("Flappy", new FlappyGameplay());
     SM.AddScene("SpaceInvadersPause", new SpaceInvadersPauseScene());
     SM.AddScene("TanksPause", new TanksPauseScene());
     SM.AddScene("SplatPause", new SplatPauseScene());
@@ -128,6 +131,7 @@ void Game::Init() {
     SM.AddScene("FroggerPause", new FroggerPauseScene());
     SM.AddScene("ArenaPause", new ArenaPauseScene());
     SM.AddScene("ScrollerPause", new ScrollerPauseScene());
+    SM.AddScene("FlappyPause", new FlappyPauseScene());
     SM.AddScene("GameOver", new GameOverScene());
 
     SM.InitFirstScene("SplashScreen");

@@ -25,6 +25,7 @@ private:
     ScoreRecord froggerScores[10];
     ScoreRecord arenaScores[10];
     ScoreRecord scrollerScores[10];
+    ScoreRecord flappyScores[10];
 
     Button* btnBack;
 
@@ -40,51 +41,40 @@ private:
     SDL_Texture* froggerTitleTex;
     SDL_Texture* arenaTitleTex;
     SDL_Texture* scrollerTitleTex;
+    SDL_Texture* flappyTitleTex;
 
-    int spaceTitleW, spaceTitleH;
-    int tanksTitleW, tanksTitleH;
-    int splatTitleW, splatTitleH;
-    int asteroidsTitleW, asteroidsTitleH;
-    int breakoutTitleW, breakoutTitleH;
-    int froggerTitleW, froggerTitleH;
-    int arenaTitleW, arenaTitleH;
-    int scrollerTitleW, scrollerTitleH;
+    int spaceTitleW, spaceTitleH, tanksTitleW, tanksTitleH;
+    int splatTitleW, splatTitleH, asteroidsTitleW, asteroidsTitleH;
+    int breakoutTitleW, breakoutTitleH, froggerTitleW, froggerTitleH;
+    int arenaTitleW, arenaTitleH, scrollerTitleW, scrollerTitleH;
+    int flappyTitleW, flappyTitleH;
 
     SDL_Texture* backgroundTexture;
 
 public:
     RankingScene()
-        : btnBack(nullptr),
-        fontTitle(nullptr),
-        titleTexture(nullptr), titleW(0), titleH(0),
-        spaceTitleTex(nullptr), tanksTitleTex(nullptr), splatTitleTex(nullptr), asteroidsTitleTex(nullptr), breakoutTitleTex(nullptr), froggerTitleTex(nullptr), arenaTitleTex(nullptr), scrollerTitleTex(nullptr),
-        spaceTitleW(0), spaceTitleH(0), tanksTitleW(0), tanksTitleH(0), splatTitleW(0), splatTitleH(0), asteroidsTitleW(0), asteroidsTitleH(0), breakoutTitleW(0), breakoutTitleH(0), froggerTitleW(0), froggerTitleH(0), arenaTitleW(0), arenaTitleH(0), scrollerTitleW(0), scrollerTitleH(0),
+        : btnBack(nullptr), fontTitle(nullptr), titleTexture(nullptr), titleW(0), titleH(0),
+        spaceTitleTex(nullptr), tanksTitleTex(nullptr), splatTitleTex(nullptr), asteroidsTitleTex(nullptr),
+        breakoutTitleTex(nullptr), froggerTitleTex(nullptr), arenaTitleTex(nullptr), scrollerTitleTex(nullptr), flappyTitleTex(nullptr),
         backgroundTexture(nullptr)
     {
         for (int i = 0; i < 10; i++) {
-            strcpy_s(spaceScores[i].name, sizeof(spaceScores[i].name), "---");
-            spaceScores[i].score = 0;
-            strcpy_s(tanksScores[i].name, sizeof(tanksScores[i].name), "---");
-            tanksScores[i].score = 0;
-            strcpy_s(splatScores[i].name, sizeof(splatScores[i].name), "---");
-            splatScores[i].score = 0;
-            strcpy_s(asteroidsScores[i].name, sizeof(asteroidsScores[i].name), "---");
-            asteroidsScores[i].score = 0;
-            strcpy_s(breakoutScores[i].name, sizeof(breakoutScores[i].name), "---");
-            breakoutScores[i].score = 0;
-            strcpy_s(froggerScores[i].name, sizeof(froggerScores[i].name), "---");
-            froggerScores[i].score = 0;
-            strcpy_s(arenaScores[i].name, sizeof(arenaScores[i].name), "---");
-            arenaScores[i].score = 0;
-            strcpy_s(scrollerScores[i].name, sizeof(scrollerScores[i].name), "---");
-            scrollerScores[i].score = 0;
+            strcpy_s(spaceScores[i].name, sizeof(spaceScores[i].name), "---"); spaceScores[i].score = 0;
+            strcpy_s(tanksScores[i].name, sizeof(tanksScores[i].name), "---"); tanksScores[i].score = 0;
+            strcpy_s(splatScores[i].name, sizeof(splatScores[i].name), "---"); splatScores[i].score = 0;
+            strcpy_s(asteroidsScores[i].name, sizeof(asteroidsScores[i].name), "---"); asteroidsScores[i].score = 0;
+            strcpy_s(breakoutScores[i].name, sizeof(breakoutScores[i].name), "---"); breakoutScores[i].score = 0;
+            strcpy_s(froggerScores[i].name, sizeof(froggerScores[i].name), "---"); froggerScores[i].score = 0;
+            strcpy_s(arenaScores[i].name, sizeof(arenaScores[i].name), "---"); arenaScores[i].score = 0;
+            strcpy_s(scrollerScores[i].name, sizeof(scrollerScores[i].name), "---"); scrollerScores[i].score = 0;
+            strcpy_s(flappyScores[i].name, sizeof(flappyScores[i].name), "---"); flappyScores[i].score = 0;
         }
     }
 
     void OnEnter() override {
         backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
 
-        RM.LoadFont("resources/fonts/fuente.otf", 22);
+        RM.LoadFont("resources/fonts/fuente.otf", 20);
         fontTitle = RM.GetFont("resources/fonts/fuente.otf");
 
         titleTexture = CreateTextTexture("RANKING", fontTitle, &titleW, &titleH);
@@ -96,6 +86,7 @@ public:
         froggerTitleTex = CreateTextTexture("Frogger", fontTitle, &froggerTitleW, &froggerTitleH);
         arenaTitleTex = CreateTextTexture("Arena", fontTitle, &arenaTitleW, &arenaTitleH);
         scrollerTitleTex = CreateTextTexture("Scroller", fontTitle, &scrollerTitleW, &scrollerTitleH);
+        flappyTitleTex = CreateTextTexture("Flappy", fontTitle, &flappyTitleW, &flappyTitleH);
 
         LoadScoresFromFile();
 
@@ -116,10 +107,8 @@ public:
         if (froggerTitleTex) SDL_DestroyTexture(froggerTitleTex);
         if (arenaTitleTex) SDL_DestroyTexture(arenaTitleTex);
         if (scrollerTitleTex) SDL_DestroyTexture(scrollerTitleTex);
-        if (btnBack) {
-            delete btnBack;
-            btnBack = nullptr;
-        }
+        if (flappyTitleTex) SDL_DestroyTexture(flappyTitleTex);
+        if (btnBack) { delete btnBack; btnBack = nullptr; }
         Scene::OnExit();
     }
 
@@ -135,35 +124,30 @@ public:
 
         RenderTexture(titleTexture, (1360 - titleW) / 2, 10, titleW, titleH);
 
-        int col1x = 20;
-        int col2x = 180;
-        int col3x = 340;
-        int col4x = 500;
-        int col5x = 660;
-        int col6x = 820;
-        int col7x = 980;
-        int col8x = 1140;
+        int cols[9] = { 20, 160, 300, 440, 580, 720, 860, 1000, 1140 };
         int topY = 70;
 
-        RenderTexture(spaceTitleTex, col1x, topY, spaceTitleW, spaceTitleH);
-        RenderTexture(tanksTitleTex, col2x, topY, tanksTitleW, tanksTitleH);
-        RenderTexture(splatTitleTex, col3x, topY, splatTitleW, splatTitleH);
-        RenderTexture(asteroidsTitleTex, col4x, topY, asteroidsTitleW, asteroidsTitleH);
-        RenderTexture(breakoutTitleTex, col5x, topY, breakoutTitleW, breakoutTitleH);
-        RenderTexture(froggerTitleTex, col6x, topY, froggerTitleW, froggerTitleH);
-        RenderTexture(arenaTitleTex, col7x, topY, arenaTitleW, arenaTitleH);
-        RenderTexture(scrollerTitleTex, col8x, topY, scrollerTitleW, scrollerTitleH);
+        RenderTexture(spaceTitleTex, cols[0], topY, spaceTitleW, spaceTitleH);
+        RenderTexture(tanksTitleTex, cols[1], topY, tanksTitleW, tanksTitleH);
+        RenderTexture(splatTitleTex, cols[2], topY, splatTitleW, splatTitleH);
+        RenderTexture(asteroidsTitleTex, cols[3], topY, asteroidsTitleW, asteroidsTitleH);
+        RenderTexture(breakoutTitleTex, cols[4], topY, breakoutTitleW, breakoutTitleH);
+        RenderTexture(froggerTitleTex, cols[5], topY, froggerTitleW, froggerTitleH);
+        RenderTexture(arenaTitleTex, cols[6], topY, arenaTitleW, arenaTitleH);
+        RenderTexture(scrollerTitleTex, cols[7], topY, scrollerTitleW, scrollerTitleH);
+        RenderTexture(flappyTitleTex, cols[8], topY, flappyTitleW, flappyTitleH);
 
         int rowY = topY + 40;
         for (int i = 0; i < 10; i++) {
-            RenderScore(spaceScores[i], col1x, rowY + i * 40);
-            RenderScore(tanksScores[i], col2x, rowY + i * 40);
-            RenderScore(splatScores[i], col3x, rowY + i * 40);
-            RenderScore(asteroidsScores[i], col4x, rowY + i * 40);
-            RenderScore(breakoutScores[i], col5x, rowY + i * 40);
-            RenderScore(froggerScores[i], col6x, rowY + i * 40);
-            RenderScore(arenaScores[i], col7x, rowY + i * 40);
-            RenderScore(scrollerScores[i], col8x, rowY + i * 40);
+            RenderScore(spaceScores[i], cols[0], rowY + i * 40);
+            RenderScore(tanksScores[i], cols[1], rowY + i * 40);
+            RenderScore(splatScores[i], cols[2], rowY + i * 40);
+            RenderScore(asteroidsScores[i], cols[3], rowY + i * 40);
+            RenderScore(breakoutScores[i], cols[4], rowY + i * 40);
+            RenderScore(froggerScores[i], cols[5], rowY + i * 40);
+            RenderScore(arenaScores[i], cols[6], rowY + i * 40);
+            RenderScore(scrollerScores[i], cols[7], rowY + i * 40);
+            RenderScore(flappyScores[i], cols[8], rowY + i * 40);
         }
 
         btnBack->Render();
@@ -180,6 +164,7 @@ public:
         else if (mode == 5) arr = froggerScores;
         else if (mode == 6) arr = arenaScores;
         else if (mode == 7) arr = scrollerScores;
+        else if (mode == 8) arr = flappyScores;
 
         std::vector<ScoreRecord> temp(arr, arr + 10);
         ScoreRecord newRecord;
@@ -207,9 +192,9 @@ public:
 
 private:
     void LoadScoresFromFile() {
-        std::ifstream file("resources/highscores_v7.bin", std::ios::binary);
+        std::ifstream file("resources/highscores_v8.bin", std::ios::binary);
         if (!file.is_open()) {
-            std::ifstream fileOld("resources/highscores_v6.bin", std::ios::binary);
+            std::ifstream fileOld("resources/highscores_v7.bin", std::ios::binary);
             if (fileOld.is_open()) {
                 fileOld.read(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
                 fileOld.read(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
@@ -218,6 +203,7 @@ private:
                 fileOld.read(reinterpret_cast<char*>(breakoutScores), sizeof(breakoutScores));
                 fileOld.read(reinterpret_cast<char*>(froggerScores), sizeof(froggerScores));
                 fileOld.read(reinterpret_cast<char*>(arenaScores), sizeof(arenaScores));
+                fileOld.read(reinterpret_cast<char*>(scrollerScores), sizeof(scrollerScores));
                 fileOld.close();
             }
             return;
@@ -230,11 +216,12 @@ private:
         file.read(reinterpret_cast<char*>(froggerScores), sizeof(froggerScores));
         file.read(reinterpret_cast<char*>(arenaScores), sizeof(arenaScores));
         file.read(reinterpret_cast<char*>(scrollerScores), sizeof(scrollerScores));
+        file.read(reinterpret_cast<char*>(flappyScores), sizeof(flappyScores));
         file.close();
     }
 
     void SaveScoresToFile() {
-        std::ofstream file("resources/highscores_v7.bin", std::ios::binary | std::ios::trunc);
+        std::ofstream file("resources/highscores_v8.bin", std::ios::binary | std::ios::trunc);
         if (!file.is_open()) return;
         file.write(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
         file.write(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
@@ -244,6 +231,7 @@ private:
         file.write(reinterpret_cast<char*>(froggerScores), sizeof(froggerScores));
         file.write(reinterpret_cast<char*>(arenaScores), sizeof(arenaScores));
         file.write(reinterpret_cast<char*>(scrollerScores), sizeof(scrollerScores));
+        file.write(reinterpret_cast<char*>(flappyScores), sizeof(flappyScores));
         file.close();
     }
 
