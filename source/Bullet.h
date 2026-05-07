@@ -9,7 +9,7 @@ protected:
     float speed;
 
 public:
-    
+
     Bullet(std::string texturePath, Vector2 startPos, Vector2 srcSize, Vector2 dir, float spd = 300.0f)
         : ImageObject(texturePath, Vector2(0, 0), srcSize),
         lifetime(3.0f),
@@ -18,12 +18,12 @@ public:
         speed(spd)
     {
         transform->position = startPos;
-        transform->scale = Vector2(1, 1);
+        transform->scale = Vector2(1.0f, 1.0f);
         physics->SetVelocity(direction * speed);
     }
 
     virtual void Update() override {
-        ImageObject::Update(); 
+        ImageObject::Update();
 
         aliveTime += TIME.GetDeltaTime();
         if (aliveTime >= lifetime) {

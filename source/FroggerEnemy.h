@@ -40,6 +40,10 @@ public:
         WrapScreen();
     }
 
+    void DestroySilently() {
+        ImageObject::Destroy();
+    }
+
     void WrapScreen() {
         float halfWidth = (transform->size.x * transform->scale.x) / 2.0f;
         if (direction > 0 && transform->position.x - halfWidth > RM.WINDOW_WIDTH) {

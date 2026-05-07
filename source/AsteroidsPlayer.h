@@ -11,11 +11,16 @@ class AsteroidsPlayer : public Player {
 private:
     float thrustPower;
     float rotationSpeed;
+    bool isImmune;
+    float immunityTimer;
+    float blinkTimer;
+    bool isVisible;
 
 public:
     AsteroidsPlayer()
         : Player("resources/player.png", Vector2(0, 0), Vector2(32, 32)),
-        thrustPower(500.0f), rotationSpeed(250.0f)
+        thrustPower(500.0f), rotationSpeed(250.0f),
+        isImmune(false), immunityTimer(0.0f), blinkTimer(0.0f), isVisible(true)
     {
         transform->position = Vector2(RM.WINDOW_WIDTH / 2.0f, RM.WINDOW_HEIGHT / 2.0f);
         transform->scale = Vector2(1.5f, 1.5f);
@@ -42,9 +47,30 @@ public:
     }
 
     void Update() override {
+        if (isImmune) {
+            immunityTimer -= TIME.GetDeltaTime();
+            blinkTimer += TIME.GetDeltaTime();
+
+            if (blinkTimer >= 0.1f) {
+                isVisible = !isVisible;
+                blinkTimer = 0.0f;
+            }
+
+            if (immunityTimer <= 0) {
+                isImmune = false;
+                isVisible = true;
+            }
+        }
+
         HandleInput();
         WrapScreen();
         Player::Update();
+    }
+
+    void Render() override {
+        if (isVisible) {
+            Player::Render();
+        }
     }
 
     void HandleInput() override {
@@ -88,9 +114,18 @@ public:
     }
 
     void OnCollisionEnter(Object* other) override {
+        if (isImmune) return;
+
         if (Enemy* e = dynamic_cast<Enemy*>(other)) {
             LoseLife();
             e->Destroy();
+
+            if (IsAlive()) {
+                isImmune = true;
+                immunityTimer = 2.0f;
+                blinkTimer = 0.0f;
+                isVisible = true;
+            }
         }
     }
 };

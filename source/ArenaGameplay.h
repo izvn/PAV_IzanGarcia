@@ -31,15 +31,21 @@ private:
 
     bool paused;
 
+    bool showingWaveCompleted;
+    float waveCompletedTimer;
+    SDL_Texture* waveCompletedTex;
+
 public:
     ArenaGameplay()
         : Scene(), player(nullptr), gameOver(false), spawnTimer(0), spawnInterval(2.0f),
         currentWave(1), waveTimer(0), backgroundTexture(nullptr), score(0), highScore(0),
-        scoreText(nullptr), livesText(nullptr), highScoreText(nullptr), waveText(nullptr), paused(false) {
+        scoreText(nullptr), livesText(nullptr), highScoreText(nullptr), waveText(nullptr),
+        paused(false), showingWaveCompleted(false), waveCompletedTimer(0.0f), waveCompletedTex(nullptr) {
     }
 
     void ForceCleanup() {
         paused = false;
+        showingWaveCompleted = false;
         Scene::OnExit();
     }
 
@@ -50,6 +56,7 @@ public:
         }
 
         gameOver = false;
+        showingWaveCompleted = false;
         score = 0;
         currentWave = 1;
         spawnInterval = 2.0f;
@@ -57,6 +64,10 @@ public:
         waveTimer = 0.0f;
 
         backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
+
+        RM.LoadTexture("resources/wavecompleted.png");
+        waveCompletedTex = RM.GetTexture("resources/wavecompleted.png");
+
         AM.StopMusic();
         AM.PlaySong("tank_music");
 
@@ -97,6 +108,14 @@ public:
             return;
         }
 
+        if (showingWaveCompleted) {
+            waveCompletedTimer -= TIME.GetDeltaTime();
+            if (waveCompletedTimer <= 0) {
+                showingWaveCompleted = false;
+            }
+            return;
+        }
+
         UpdateHUD();
 
         if (!gameOver) {
@@ -107,6 +126,9 @@ public:
                 currentWave++;
                 spawnInterval = std::fmax(0.3f, spawnInterval - 0.15f);
                 AM.PlayClip("tank_end_wave", 0);
+
+                showingWaveCompleted = true;
+                waveCompletedTimer = 2.0f;
             }
 
             spawnTimer -= dt;
@@ -151,6 +173,17 @@ public:
         }
         for (Object* o : objects) {
             o->Render();
+        }
+
+        if (showingWaveCompleted && waveCompletedTex) {
+            int texW, texH;
+            SDL_QueryTexture(waveCompletedTex, NULL, NULL, &texW, &texH);
+            SDL_Rect dest = {
+                (int)((RM.WINDOW_WIDTH - texW) / 2),
+                (int)((RM.WINDOW_HEIGHT - texH) / 2),
+                texW, texH
+            };
+            SDL_RenderCopy(RM.GetRenderer(), waveCompletedTex, nullptr, &dest);
         }
     }
 

@@ -23,6 +23,8 @@ private:
     float waveTimer;
 
     SDL_Texture* backgroundTexture;
+    float bgX1;
+    float bgX2;
 
     int score;
     int highScore;
@@ -33,16 +35,22 @@ private:
 
     bool paused;
 
+    bool showingWaveCompleted;
+    float waveCompletedTimer;
+    SDL_Texture* waveCompletedTex;
+
 public:
     ScrollerGameplay()
         : Scene(), player(nullptr), gameOver(false), spawnTimer(0), spawnInterval(1.5f),
-        currentWave(1), waveTimer(0), backgroundTexture(nullptr),
+        currentWave(1), waveTimer(0), backgroundTexture(nullptr), bgX1(0), bgX2(1360),
         score(0), highScore(0), scoreText(nullptr), livesText(nullptr), waveText(nullptr),
-        highScoreText(nullptr), paused(false) {
+        highScoreText(nullptr), paused(false),
+        showingWaveCompleted(false), waveCompletedTimer(0.0f), waveCompletedTex(nullptr) {
     }
 
     void ForceCleanup() {
         paused = false;
+        showingWaveCompleted = false;
         Scene::OnExit();
     }
 
@@ -53,13 +61,21 @@ public:
         }
 
         gameOver = false;
+        showingWaveCompleted = false;
         score = 0;
         currentWave = 1;
         spawnInterval = 1.5f;
         spawnTimer = 1.0f;
         waveTimer = 0.0f;
 
+        bgX1 = 0;
+        bgX2 = (float)RM.WINDOW_WIDTH;
+
         backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
+
+        RM.LoadTexture("resources/wavecompleted.png");
+        waveCompletedTex = RM.GetTexture("resources/wavecompleted.png");
+
         AM.StopMusic();
         AM.PlaySong("menu_music");
 
@@ -100,7 +116,16 @@ public:
             return;
         }
 
+        if (showingWaveCompleted) {
+            waveCompletedTimer -= TIME.GetDeltaTime();
+            if (waveCompletedTimer <= 0) {
+                showingWaveCompleted = false;
+            }
+            return;
+        }
+
         UpdateHUD();
+        UpdateBackground();
 
         if (!gameOver) {
             float dt = TIME.GetDeltaTime();
@@ -110,6 +135,9 @@ public:
                 currentWave++;
                 spawnInterval = std::fmax(0.3f, spawnInterval - 0.15f);
                 AM.PlayClip("tank_end_wave", 0);
+
+                showingWaveCompleted = true;
+                waveCompletedTimer = 2.0f;
             }
 
             spawnTimer -= dt;
@@ -151,14 +179,37 @@ public:
 
     void Render() override {
         if (backgroundTexture) {
-            SDL_RenderCopy(RM.GetRenderer(), backgroundTexture, nullptr, nullptr);
+            SDL_Rect dest1 = { (int)bgX1, 0, (int)RM.WINDOW_WIDTH, (int)RM.WINDOW_HEIGHT };
+            SDL_Rect dest2 = { (int)bgX2, 0, (int)RM.WINDOW_WIDTH, (int)RM.WINDOW_HEIGHT };
+            SDL_RenderCopy(RM.GetRenderer(), backgroundTexture, nullptr, &dest1);
+            SDL_RenderCopy(RM.GetRenderer(), backgroundTexture, nullptr, &dest2);
         }
         for (Object* o : objects) {
             o->Render();
         }
+
+        if (showingWaveCompleted && waveCompletedTex) {
+            int texW, texH;
+            SDL_QueryTexture(waveCompletedTex, NULL, NULL, &texW, &texH);
+            SDL_Rect dest = {
+                (int)((RM.WINDOW_WIDTH - texW) / 2),
+                (int)((RM.WINDOW_HEIGHT - texH) / 2),
+                texW, texH
+            };
+            SDL_RenderCopy(RM.GetRenderer(), waveCompletedTex, nullptr, &dest);
+        }
     }
 
 private:
+    void UpdateBackground() {
+        float speed = 100.0f * TIME.GetDeltaTime();
+        bgX1 -= speed;
+        bgX2 -= speed;
+
+        if (bgX1 <= -(float)RM.WINDOW_WIDTH) bgX1 = bgX2 + (float)RM.WINDOW_WIDTH;
+        if (bgX2 <= -(float)RM.WINDOW_WIDTH) bgX2 = bgX1 + (float)RM.WINDOW_WIDTH;
+    }
+
     void SpawnEnemy() {
         float yPos = 80.0f + (rand() % (RM.WINDOW_HEIGHT - 160));
         Vector2 pos((float)RM.WINDOW_WIDTH + 50.0f, yPos);

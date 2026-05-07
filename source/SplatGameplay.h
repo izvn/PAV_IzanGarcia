@@ -34,25 +34,23 @@ private:
 
     bool paused;
 
+    bool showingWaveCompleted;
+    float waveCompletedTimer;
+    SDL_Texture* waveCompletedTex;
+
 public:
     SplatGameplay()
         : Scene(),
-        player(nullptr),
-        gameOver(false),
-        totalWaves(0),
-        activeEnemies(0),
-        backgroundTexture(nullptr),
-        score(0),
-        highScore(0),
-        scoreText(nullptr),
-        livesText(nullptr),
-        highScoreText(nullptr),
-        paused(false)
+        player(nullptr), gameOver(false), totalWaves(0), activeEnemies(0),
+        backgroundTexture(nullptr), score(0), highScore(0),
+        scoreText(nullptr), livesText(nullptr), highScoreText(nullptr),
+        paused(false), showingWaveCompleted(false), waveCompletedTimer(0.0f), waveCompletedTex(nullptr)
     {
     }
 
     void ForceCleanup() {
         paused = false;
+        showingWaveCompleted = false;
         Scene::OnExit();
     }
 
@@ -64,10 +62,15 @@ public:
         }
 
         gameOver = false;
+        showingWaveCompleted = false;
         score = 0;
         activeEnemies = 0;
 
         backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
+
+        RM.LoadTexture("resources/wavecompleted.png");
+        waveCompletedTex = RM.GetTexture("resources/wavecompleted.png");
+
         AM.StopMusic();
         AM.PlaySong("splat_music");
 
@@ -112,6 +115,15 @@ public:
             return;
         }
 
+        if (showingWaveCompleted) {
+            waveCompletedTimer -= TIME.GetDeltaTime();
+            if (waveCompletedTimer <= 0) {
+                showingWaveCompleted = false;
+                SpawnRandomWave();
+            }
+            return;
+        }
+
         UpdateHUD();
 
         for (int i = (int)objects.size() - 1; i >= 0; i--) {
@@ -139,8 +151,9 @@ public:
             EndGame();
         }
 
-        if (!gameOver && activeEnemies <= 0 && totalWaves > 0) {
-            SpawnRandomWave();
+        if (!gameOver && activeEnemies <= 0 && totalWaves > 0 && !showingWaveCompleted) {
+            showingWaveCompleted = true;
+            waveCompletedTimer = 2.0f;
         }
     }
 
@@ -149,6 +162,17 @@ public:
             SDL_RenderCopy(RM.GetRenderer(), backgroundTexture, nullptr, nullptr);
         for (Object* o : objects) {
             o->Render();
+        }
+
+        if (showingWaveCompleted && waveCompletedTex) {
+            int texW, texH;
+            SDL_QueryTexture(waveCompletedTex, NULL, NULL, &texW, &texH);
+            SDL_Rect dest = {
+                (int)((RM.WINDOW_WIDTH - texW) / 2),
+                (int)((RM.WINDOW_HEIGHT - texH) / 2),
+                texW, texH
+            };
+            SDL_RenderCopy(RM.GetRenderer(), waveCompletedTex, nullptr, &dest);
         }
     }
 
@@ -181,6 +205,8 @@ private:
         if (waveCounts.empty()) return;
         int randomIndex = rand() % waveCounts.size();
         int count = waveCounts[randomIndex];
+
+        AM.PlayClip("tank_end_wave", 0);
 
         for (int i = 0; i < count; i++) {
             Vector2 pos((float)(rand() % RM.WINDOW_WIDTH), (float)(rand() % RM.WINDOW_HEIGHT));

@@ -26,15 +26,21 @@ private:
 
     bool paused;
 
+    bool showingWaveCompleted;
+    float waveCompletedTimer;
+    SDL_Texture* waveCompletedTex;
+
 public:
     FroggerGameplay()
         : Scene(), player(nullptr), gameOver(false), currentLevel(1),
         backgroundTexture(nullptr), score(0), highScore(0),
-        scoreText(nullptr), livesText(nullptr), highScoreText(nullptr), paused(false) {
+        scoreText(nullptr), livesText(nullptr), highScoreText(nullptr), paused(false),
+        showingWaveCompleted(false), waveCompletedTimer(0.0f), waveCompletedTex(nullptr) {
     }
 
     void ForceCleanup() {
         paused = false;
+        showingWaveCompleted = false;
         Scene::OnExit();
     }
 
@@ -45,10 +51,15 @@ public:
         }
 
         gameOver = false;
+        showingWaveCompleted = false;
         score = 0;
         currentLevel = 1;
 
         backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
+
+        RM.LoadTexture("resources/wavecompleted.png");
+        waveCompletedTex = RM.GetTexture("resources/wavecompleted.png");
+
         AM.StopMusic();
         AM.PlaySong("menu_music");
 
@@ -87,6 +98,15 @@ public:
             return;
         }
 
+        if (showingWaveCompleted) {
+            waveCompletedTimer -= TIME.GetDeltaTime();
+            if (waveCompletedTimer <= 0) {
+                showingWaveCompleted = false;
+                SpawnLevel(currentLevel);
+            }
+            return;
+        }
+
         UpdateHUD();
 
         for (int i = (int)objects.size() - 1; i >= 0; i--) {
@@ -115,8 +135,11 @@ public:
             currentLevel++;
             player->ResetPosition();
             AM.PlayClip("tank_end_wave", 0);
-            ClearEnemies();
-            SpawnLevel(currentLevel);
+
+            ClearEnemiesSilently();
+
+            showingWaveCompleted = true;
+            waveCompletedTimer = 2.0f;
         }
     }
 
@@ -126,6 +149,17 @@ public:
         }
         for (Object* o : objects) {
             o->Render();
+        }
+
+        if (showingWaveCompleted && waveCompletedTex) {
+            int texW, texH;
+            SDL_QueryTexture(waveCompletedTex, NULL, NULL, &texW, &texH);
+            SDL_Rect dest = {
+                (int)((RM.WINDOW_WIDTH - texW) / 2),
+                (int)((RM.WINDOW_HEIGHT - texH) / 2),
+                texW, texH
+            };
+            SDL_RenderCopy(RM.GetRenderer(), waveCompletedTex, nullptr, &dest);
         }
     }
 
@@ -152,10 +186,10 @@ private:
         }
     }
 
-    void ClearEnemies() {
+    void ClearEnemiesSilently() {
         for (Object* o : objects) {
-            if (dynamic_cast<FroggerEnemy*>(o)) {
-                o->Destroy();
+            if (FroggerEnemy* e = dynamic_cast<FroggerEnemy*>(o)) {
+                e->DestroySilently();
             }
         }
     }

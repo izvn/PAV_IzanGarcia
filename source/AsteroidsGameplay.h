@@ -25,15 +25,21 @@ private:
     TextObject* highScoreText;
     bool paused;
 
+    bool showingWaveCompleted;
+    float waveCompletedTimer;
+    SDL_Texture* waveCompletedTex;
+
 public:
     AsteroidsGameplay()
         : Scene(), player(nullptr), gameOver(false), currentWave(1), activeEnemies(0),
         backgroundTexture(nullptr), score(0), highScore(0),
-        scoreText(nullptr), livesText(nullptr), highScoreText(nullptr), paused(false) {
+        scoreText(nullptr), livesText(nullptr), highScoreText(nullptr), paused(false),
+        showingWaveCompleted(false), waveCompletedTimer(0.0f), waveCompletedTex(nullptr) {
     }
 
     void ForceCleanup() {
         paused = false;
+        showingWaveCompleted = false;
         Scene::OnExit();
     }
 
@@ -44,11 +50,16 @@ public:
         }
 
         gameOver = false;
+        showingWaveCompleted = false;
         score = 0;
         activeEnemies = 0;
         currentWave = 1;
 
         backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
+
+        RM.LoadTexture("resources/wavecompleted.png");
+        waveCompletedTex = RM.GetTexture("resources/wavecompleted.png");
+
         AM.StopMusic();
         AM.PlaySong("space_invaders_music");
 
@@ -84,6 +95,15 @@ public:
     void Update() override {
         if (!gameOver && Input.GetEvent(SDLK_ESCAPE, DOWN)) {
             SM.SetNextScene("AsteroidsPause");
+            return;
+        }
+
+        if (showingWaveCompleted) {
+            waveCompletedTimer -= TIME.GetDeltaTime();
+            if (waveCompletedTimer <= 0) {
+                showingWaveCompleted = false;
+                SpawnWave(currentWave);
+            }
             return;
         }
 
@@ -123,9 +143,10 @@ public:
             EndGame();
         }
 
-        if (!gameOver && activeEnemies <= 0 && player->IsAlive()) {
+        if (!gameOver && activeEnemies <= 0 && player->IsAlive() && !showingWaveCompleted) {
             currentWave++;
-            SpawnWave(currentWave);
+            showingWaveCompleted = true;
+            waveCompletedTimer = 2.0f;
         }
     }
 
@@ -135,6 +156,17 @@ public:
         }
         for (Object* o : objects) {
             o->Render();
+        }
+
+        if (showingWaveCompleted && waveCompletedTex) {
+            int texW, texH;
+            SDL_QueryTexture(waveCompletedTex, NULL, NULL, &texW, &texH);
+            SDL_Rect dest = {
+                (int)((RM.WINDOW_WIDTH - texW) / 2),
+                (int)((RM.WINDOW_HEIGHT - texH) / 2),
+                texW, texH
+            };
+            SDL_RenderCopy(RM.GetRenderer(), waveCompletedTex, nullptr, &dest);
         }
     }
 
