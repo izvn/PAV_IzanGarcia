@@ -15,7 +15,6 @@ class FroggerGameplay : public Scene {
 private:
     FroggerPlayer* player;
     bool gameOver;
-
     int currentLevel;
     SDL_Texture* backgroundTexture;
     int score;
@@ -23,9 +22,7 @@ private:
     TextObject* scoreText;
     TextObject* livesText;
     TextObject* highScoreText;
-
     bool paused;
-
     bool showingWaveCompleted;
     float waveCompletedTimer;
     SDL_Texture* waveCompletedTex;
@@ -49,37 +46,27 @@ public:
             paused = false;
             return;
         }
-
         gameOver = false;
         showingWaveCompleted = false;
         score = 0;
         currentLevel = 1;
-
         backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
-
         RM.LoadTexture("resources/wavecompleted.png");
         waveCompletedTex = RM.GetTexture("resources/wavecompleted.png");
-
         AM.StopMusic();
         AM.PlaySong("menu_music");
-
         srand((unsigned)time(NULL));
-
         player = new FroggerPlayer();
         SPAWN.SpawnObject(player);
-
         scoreText = new TextObject("", Vector2(0, 0), Vector2(150, 40), "SCORE: 000000");
         scoreText->GetTransform()->position = Vector2(120, 30);
         SPAWN.SpawnObject(scoreText);
-
         livesText = new TextObject("", Vector2(0, 0), Vector2(150, 40), "Lives: 3");
         livesText->GetTransform()->position = Vector2(680, 30);
         SPAWN.SpawnObject(livesText);
-
         highScoreText = new TextObject("", Vector2(0, 0), Vector2(200, 40), "High: 000000");
         highScoreText->GetTransform()->position = Vector2(1260, 30);
         SPAWN.SpawnObject(highScoreText);
-
         SpawnLevel(currentLevel);
     }
 
@@ -97,7 +84,6 @@ public:
             SM.SetNextScene("FroggerPause");
             return;
         }
-
         if (showingWaveCompleted) {
             waveCompletedTimer -= TIME.GetDeltaTime();
             if (waveCompletedTimer <= 0) {
@@ -106,38 +92,29 @@ public:
             }
             return;
         }
-
         UpdateHUD();
-
         for (int i = (int)objects.size() - 1; i >= 0; i--) {
             if (objects[i]->IsPendingDestroy()) {
                 delete objects[i];
                 objects.erase(objects.begin() + i);
             }
         }
-
         while (SPAWN.GetSpawnedObjectsCount() > 0) {
             objects.push_back(SPAWN.GetSpawnedObject());
         }
-
         for (Object* o : objects) {
             o->Update();
         }
-
         CheckCollisions();
-
         if (player && !player->IsAlive() && !gameOver) {
             EndGame();
         }
-
         if (player && player->GetTransform()->position.y <= 90.0f) {
             AddScore(500 * currentLevel);
             currentLevel++;
             player->ResetPosition();
             AM.PlayClip("tank_end_wave", 0);
-
             ClearEnemiesSilently();
-
             showingWaveCompleted = true;
             waveCompletedTimer = 2.0f;
         }
@@ -150,15 +127,8 @@ public:
         for (Object* o : objects) {
             o->Render();
         }
-
         if (showingWaveCompleted && waveCompletedTex) {
-            int texW, texH;
-            SDL_QueryTexture(waveCompletedTex, NULL, NULL, &texW, &texH);
-            SDL_Rect dest = {
-                (int)((RM.WINDOW_WIDTH - texW) / 2),
-                (int)((RM.WINDOW_HEIGHT - texH) / 2),
-                texW, texH
-            };
+            SDL_Rect dest = { 0, 0, (int)RM.WINDOW_WIDTH, (int)RM.WINDOW_HEIGHT };
             SDL_RenderCopy(RM.GetRenderer(), waveCompletedTex, nullptr, &dest);
         }
     }
@@ -167,18 +137,14 @@ private:
     void SpawnLevel(int level) {
         float baseY = RM.WINDOW_HEIGHT - 112.0f;
         int numLanes = 9;
-
         for (int i = 0; i < numLanes; i++) {
             if (i == 4) continue;
-
             float laneY = baseY - (i * 64.0f);
             float direction = (i % 2 == 0) ? 1.0f : -1.0f;
             float baseSpeed = 90.0f + (rand() % 40) + (level * 15.0f);
             int numEnemies = 2 + (rand() % 3);
-
             float spacing = RM.WINDOW_WIDTH / numEnemies;
             float offset = (float)(rand() % 150);
-
             for (int j = 0; j < numEnemies; j++) {
                 Vector2 pos(offset + j * spacing, laneY);
                 SPAWN.SpawnObject(new FroggerEnemy(pos, baseSpeed, direction));
@@ -196,7 +162,6 @@ private:
 
     void CheckCollisions() {
         if (!player) return;
-
         for (Object* o : objects) {
             if (FroggerEnemy* enemy = dynamic_cast<FroggerEnemy*>(o)) {
                 if (player->GetRigidbody()->CheckCollision(enemy->GetRigidbody())) {

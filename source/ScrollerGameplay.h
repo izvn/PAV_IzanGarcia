@@ -16,25 +16,20 @@ class ScrollerGameplay : public Scene {
 private:
     ScrollerPlayer* player;
     bool gameOver;
-
     float spawnTimer;
     float spawnInterval;
     int currentWave;
     float waveTimer;
-
     SDL_Texture* backgroundTexture;
     float bgX1;
     float bgX2;
-
     int score;
     int highScore;
     TextObject* scoreText;
     TextObject* livesText;
     TextObject* waveText;
     TextObject* highScoreText;
-
     bool paused;
-
     bool showingWaveCompleted;
     float waveCompletedTimer;
     SDL_Texture* waveCompletedTex;
@@ -59,7 +54,6 @@ public:
             paused = false;
             return;
         }
-
         gameOver = false;
         showingWaveCompleted = false;
         score = 0;
@@ -67,35 +61,25 @@ public:
         spawnInterval = 1.5f;
         spawnTimer = 1.0f;
         waveTimer = 0.0f;
-
         bgX1 = 0;
         bgX2 = (float)RM.WINDOW_WIDTH;
-
         backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
-
         RM.LoadTexture("resources/wavecompleted.png");
         waveCompletedTex = RM.GetTexture("resources/wavecompleted.png");
-
         AM.StopMusic();
         AM.PlaySong("menu_music");
-
         srand((unsigned)time(NULL));
-
         player = new ScrollerPlayer();
         SPAWN.SpawnObject(player);
-
         scoreText = new TextObject("", Vector2(0, 0), Vector2(150, 40), "SCORE: 000000");
         scoreText->GetTransform()->position = Vector2(120, 30);
         SPAWN.SpawnObject(scoreText);
-
         livesText = new TextObject("", Vector2(0, 0), Vector2(150, 40), "Lives: 3");
         livesText->GetTransform()->position = Vector2(500, 30);
         SPAWN.SpawnObject(livesText);
-
         waveText = new TextObject("", Vector2(0, 0), Vector2(150, 40), "WAVE: 1");
         waveText->GetTransform()->position = Vector2(880, 30);
         SPAWN.SpawnObject(waveText);
-
         highScoreText = new TextObject("", Vector2(0, 0), Vector2(200, 40), "High: 000000");
         highScoreText->GetTransform()->position = Vector2(1260, 30);
         SPAWN.SpawnObject(highScoreText);
@@ -115,7 +99,6 @@ public:
             SM.SetNextScene("ScrollerPause");
             return;
         }
-
         if (showingWaveCompleted) {
             waveCompletedTimer -= TIME.GetDeltaTime();
             if (waveCompletedTimer <= 0) {
@@ -123,10 +106,8 @@ public:
             }
             return;
         }
-
         UpdateHUD();
         UpdateBackground();
-
         if (!gameOver) {
             float dt = TIME.GetDeltaTime();
             waveTimer += dt;
@@ -135,11 +116,10 @@ public:
                 currentWave++;
                 spawnInterval = std::fmax(0.3f, spawnInterval - 0.15f);
                 AM.PlayClip("tank_end_wave", 0);
-
+                ClearProjectiles();
                 showingWaveCompleted = true;
                 waveCompletedTimer = 2.0f;
             }
-
             spawnTimer -= dt;
             if (spawnTimer <= 0.0f) {
                 int enemiesToSpawn = 1 + (currentWave / 2);
@@ -149,7 +129,6 @@ public:
                 spawnTimer = spawnInterval;
             }
         }
-
         for (int i = (int)objects.size() - 1; i >= 0; i--) {
             if (objects[i]->IsPendingDestroy()) {
                 if (Enemy* e = dynamic_cast<Enemy*>(objects[i])) {
@@ -161,17 +140,13 @@ public:
                 objects.erase(objects.begin() + i);
             }
         }
-
         while (SPAWN.GetSpawnedObjectsCount() > 0) {
             objects.push_back(SPAWN.GetSpawnedObject());
         }
-
         for (Object* o : objects) {
             o->Update();
         }
-
         CheckCollisions();
-
         if (player && !player->IsAlive() && !gameOver) {
             EndGame();
         }
@@ -187,25 +162,23 @@ public:
         for (Object* o : objects) {
             o->Render();
         }
-
         if (showingWaveCompleted && waveCompletedTex) {
-            int texW, texH;
-            SDL_QueryTexture(waveCompletedTex, NULL, NULL, &texW, &texH);
-            SDL_Rect dest = {
-                (int)((RM.WINDOW_WIDTH - texW) / 2),
-                (int)((RM.WINDOW_HEIGHT - texH) / 2),
-                texW, texH
-            };
+            SDL_Rect dest = { 0, 0, (int)RM.WINDOW_WIDTH, (int)RM.WINDOW_HEIGHT };
             SDL_RenderCopy(RM.GetRenderer(), waveCompletedTex, nullptr, &dest);
         }
     }
 
 private:
+    void ClearProjectiles() {
+        for (Object* o : objects) {
+            if (dynamic_cast<Bullet*>(o)) o->Destroy();
+        }
+    }
+
     void UpdateBackground() {
         float speed = 100.0f * TIME.GetDeltaTime();
         bgX1 -= speed;
         bgX2 -= speed;
-
         if (bgX1 <= -(float)RM.WINDOW_WIDTH) bgX1 = bgX2 + (float)RM.WINDOW_WIDTH;
         if (bgX2 <= -(float)RM.WINDOW_WIDTH) bgX2 = bgX1 + (float)RM.WINDOW_WIDTH;
     }
@@ -213,10 +186,8 @@ private:
     void SpawnEnemy() {
         float yPos = 80.0f + (rand() % (RM.WINDOW_HEIGHT - 160));
         Vector2 pos((float)RM.WINDOW_WIDTH + 50.0f, yPos);
-
         float speed = 150.0f + (currentWave * 15.0f) + (rand() % 50);
         float verticalRange = (rand() % 2 == 0) ? (float)(rand() % 150) : 0.0f;
-
         SPAWN.SpawnObject(new ScrollerEnemy(pos, speed, verticalRange));
     }
 

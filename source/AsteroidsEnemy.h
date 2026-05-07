@@ -2,22 +2,26 @@
 #include "Enemy.h"
 #include "GameConfig.h"
 #include "AnimatedImageRenderer.h"
+#include "RenderManager.h"
 #include "ExplosionEffect.h"
 #include "Spawner.h"
-#include "RenderManager.h"
-#include <cstdlib>
 #include <cmath>
 
-class AsteroidEnemy : public Enemy {
+class AsteroidsEnemy : public Enemy {
 public:
     int sizeLevel;
+private:
+    Vector2 velocity;
 
-    AsteroidEnemy(Vector2 pos, int level, Vector2 velocity)
+public:
+    AsteroidsEnemy(Vector2 pos, int size, Vector2 vel)
         : Enemy(GameConfig::GetEnemySkin("enemy"), Vector2(0, 0), Vector2(32, 32)),
-        sizeLevel(level)
+        sizeLevel(size), velocity(vel)
     {
         transform->position = pos;
-        transform->scale = Vector2(0.5f * level + 0.5f, 0.5f * level + 0.5f);
+
+        float scaleMultiplier = (float)sizeLevel * 0.8f;
+        transform->scale = Vector2(scaleMultiplier, scaleMultiplier);
 
         physics->SetVelocity(velocity);
 
@@ -51,15 +55,18 @@ public:
     }
 
     void Destroy() override {
+        SPAWN.SpawnObject(new ExplosionEffect(transform->position));
+
         if (sizeLevel > 1) {
-            for (int i = 0; i < 2; ++i) {
+            for (int i = 0; i < 2; i++) {
                 float angle = (rand() % 360) * (M_PI / 180.0f);
-                float speed = 80.0f + (rand() % 60);
+                Vector2 currentVel = physics->GetVelocity();
+                float speed = std::sqrt(currentVel.x * currentVel.x + currentVel.y * currentVel.y) * 1.3f;
                 Vector2 newVel(cos(angle) * speed, sin(angle) * speed);
-                SPAWN.SpawnObject(new AsteroidEnemy(transform->position, sizeLevel - 1, newVel));
+                SPAWN.SpawnObject(new AsteroidsEnemy(transform->position, sizeLevel - 1, newVel));
             }
         }
-        SPAWN.SpawnObject(new ExplosionEffect(transform->position));
+
         Enemy::Destroy();
     }
 };

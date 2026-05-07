@@ -24,19 +24,15 @@ class TanksGameplay : public Scene {
 private:
     TanksPlayer* player;
     bool gameOver;
-
     int totalWaves;
     int activeEnemies;
-
     SDL_Texture* backgroundTexture;
     int score;
     int highScore;
     TextObject* scoreText;
     TextObject* livesText;
     TextObject* highScoreText;
-
     bool paused;
-
     bool showingWaveCompleted;
     float waveCompletedTimer;
     SDL_Texture* waveCompletedTex;
@@ -67,42 +63,31 @@ public:
     }
 
     void OnEnter() override {
-        if (paused)
-        {
+        if (paused) {
             paused = false;
             return;
         }
-
         gameOver = false;
         showingWaveCompleted = false;
         score = 0;
         activeEnemies = 0;
-
         backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
-
         RM.LoadTexture("resources/wavecompleted.png");
         waveCompletedTex = RM.GetTexture("resources/wavecompleted.png");
-
         AM.StopMusic();
         AM.PlaySong("tank_music");
-
         srand((unsigned)time(NULL));
-
         player = new TanksPlayer();
         SPAWN.SpawnObject(player);
-
         scoreText = new TextObject("", Vector2(0, 0), Vector2(150, 40), "SCORE: 000000");
         scoreText->GetTransform()->position = Vector2(120, 30);
         SPAWN.SpawnObject(scoreText);
-
         livesText = new TextObject("", Vector2(0, 0), Vector2(150, 40), "Lives: 3");
         livesText->GetTransform()->position = Vector2(680, 30);
         SPAWN.SpawnObject(livesText);
-
         highScoreText = new TextObject("", Vector2(0, 0), Vector2(200, 40), "High: 000000");
         highScoreText->GetTransform()->position = Vector2(1260, 30);
         SPAWN.SpawnObject(highScoreText);
-
         LoadWavesFromXML("resources/tanks_waves.xml");
         if (!wavesData.empty()) {
             totalWaves = (int)wavesData.size();
@@ -111,23 +96,19 @@ public:
     }
 
     void OnExit() override {
-        if (SM.GetNextSceneName() == "TanksPause")
-        {
+        if (SM.GetNextSceneName() == "TanksPause") {
             paused = true;
             return;
         }
-
         AM.StopMusic();
         Scene::OnExit();
     }
 
     void Update() override {
-        if (!gameOver && Input.GetEvent(SDLK_ESCAPE, DOWN))
-        {
+        if (!gameOver && Input.GetEvent(SDLK_ESCAPE, DOWN)) {
             SM.SetNextScene("TanksPause");
             return;
         }
-
         if (showingWaveCompleted) {
             waveCompletedTimer -= TIME.GetDeltaTime();
             if (waveCompletedTimer <= 0) {
@@ -136,9 +117,7 @@ public:
             }
             return;
         }
-
         UpdateHUD();
-
         for (int i = (int)objects.size() - 1; i >= 0; i--) {
             if (objects[i]->IsPendingDestroy()) {
                 if (Enemy* e = dynamic_cast<Enemy*>(objects[i])) {
@@ -149,22 +128,18 @@ public:
                 objects.erase(objects.begin() + i);
             }
         }
-
         while (SPAWN.GetSpawnedObjectsCount() > 0) {
             objects.push_back(SPAWN.GetSpawnedObject());
         }
-
         for (Object* o : objects) {
             o->Update();
         }
-
         CheckCollisions();
-
         if (player && !player->IsAlive() && !gameOver) {
             EndGame();
         }
-
         if (!gameOver && activeEnemies <= 0 && totalWaves > 0 && !showingWaveCompleted) {
+            ClearBullets();
             showingWaveCompleted = true;
             waveCompletedTimer = 2.0f;
         }
@@ -176,32 +151,27 @@ public:
         for (Object* o : objects) {
             o->Render();
         }
-
         if (showingWaveCompleted && waveCompletedTex) {
-            int texW, texH;
-            SDL_QueryTexture(waveCompletedTex, NULL, NULL, &texW, &texH);
-            SDL_Rect dest = {
-                (int)((RM.WINDOW_WIDTH - texW) / 2),
-                (int)((RM.WINDOW_HEIGHT - texH) / 2),
-                texW, texH
-            };
+            SDL_Rect dest = { 0, 0, (int)RM.WINDOW_WIDTH, (int)RM.WINDOW_HEIGHT };
             SDL_RenderCopy(RM.GetRenderer(), waveCompletedTex, nullptr, &dest);
         }
     }
 
 private:
+    void ClearBullets() {
+        for (Object* o : objects) {
+            if (dynamic_cast<Bullet*>(o)) o->Destroy();
+        }
+    }
+
     void LoadWavesFromXML(const std::string& filePath) {
         wavesData.clear();
         try {
             rapidxml::file<> xmlFile(filePath.c_str());
             rapidxml::xml_document<> doc;
             doc.parse<0>(xmlFile.data());
-
             rapidxml::xml_node<>* root = doc.first_node("waves");
-            if (!root) {
-                return;
-            }
-
+            if (!root) return;
             for (auto* waveNode = root->first_node("wave"); waveNode; waveNode = waveNode->next_sibling("wave")) {
                 std::vector<EnemyInfo> waveEnemies;
                 for (auto* enemyNode = waveNode->first_node("enemy"); enemyNode; enemyNode = enemyNode->next_sibling("enemy")) {
@@ -210,26 +180,18 @@ private:
                     ei.count = std::stoi(enemyNode->first_attribute("count")->value());
                     ei.speed = std::stof(enemyNode->first_attribute("speed")->value());
                     ei.health = std::stof(enemyNode->first_attribute("health")->value());
-                    if (enemyNode->first_attribute("shootInterval")) {
-                        ei.shootInterval = std::stof(enemyNode->first_attribute("shootInterval")->value());
-                    }
-                    else {
-                        ei.shootInterval = 2.0f;
-                    }
+                    ei.shootInterval = enemyNode->first_attribute("shootInterval") ? std::stof(enemyNode->first_attribute("shootInterval")->value()) : 2.0f;
                     waveEnemies.push_back(ei);
                 }
                 wavesData.push_back(waveEnemies);
             }
         }
-        catch (std::exception& e) {
-        }
+        catch (...) {}
     }
 
     void SpawnRandomWave() {
         if (wavesData.empty()) return;
-
         int randomIndex = rand() % wavesData.size();
-
         for (auto& ei : wavesData[randomIndex]) {
             for (int i = 0; i < ei.count; i++) {
                 SpawnEnemy(ei);
@@ -243,49 +205,29 @@ private:
         Vector2 pos;
         bool validPos = false;
         int attempts = 0;
-        float safeRadius = 300.0f;
-
         while (!validPos && attempts < 100) {
             pos = GetRandomPositionInsideGameArea();
             validPos = true;
             if (player) {
                 float dx = pos.x - player->GetTransform()->position.x;
                 float dy = pos.y - player->GetTransform()->position.y;
-                float dist = sqrt(dx * dx + dy * dy);
-                if (dist < safeRadius) validPos = false;
+                if (sqrt(dx * dx + dy * dy) < 300.0f) validPos = false;
             }
             attempts++;
         }
-
         Enemy* newEnemy = nullptr;
-        if (ei.type == "BasicEnemyTanks") {
-            newEnemy = new BasicEnemyTanks(pos);
-        }
-        else if (ei.type == "SeekerEnemy") {
-            newEnemy = new SeekerEnemy(pos);
-        }
-        else if (ei.type == "ShootingEnemy") {
-            newEnemy = new ShootingEnemy(pos);
-        }
-        else if (ei.type == "AimingEnemy") {
-            newEnemy = new AimingEnemy(pos);
-        }
-        else if (ei.type == "ExplodingEnemy") {
-            newEnemy = new ExplodingEnemy(pos);
-        }
-        else {
-            newEnemy = new BasicEnemyTanks(pos);
-        }
-
+        if (ei.type == "BasicEnemyTanks") newEnemy = new BasicEnemyTanks(pos);
+        else if (ei.type == "SeekerEnemy") newEnemy = new SeekerEnemy(pos);
+        else if (ei.type == "ShootingEnemy") newEnemy = new ShootingEnemy(pos);
+        else if (ei.type == "AimingEnemy") newEnemy = new AimingEnemy(pos);
+        else if (ei.type == "ExplodingEnemy") newEnemy = new ExplodingEnemy(pos);
+        else newEnemy = new BasicEnemyTanks(pos);
         SPAWN.SpawnObject(newEnemy);
     }
 
     Vector2 GetRandomPositionInsideGameArea() {
         int padding = 64;
-        return Vector2(
-            (float)(padding + rand() % (RM.WINDOW_WIDTH - 2 * padding)),
-            (float)(padding + rand() % (RM.WINDOW_HEIGHT - 2 * padding))
-        );
+        return Vector2((float)(padding + rand() % (RM.WINDOW_WIDTH - 2 * padding)), (float)(padding + rand() % (RM.WINDOW_HEIGHT - 2 * padding)));
     }
 
     void CheckCollisions() {
@@ -303,9 +245,7 @@ private:
 
     void AddScore(int amount) {
         score += amount;
-        if (score > highScore) {
-            highScore = score;
-        }
+        if (score > highScore) highScore = score;
     }
 
     void UpdateHUD() {
@@ -327,9 +267,7 @@ private:
     }
 
     void EndGame() {
-        if (player) {
-            score += player->GetLives() * 10000;
-        }
+        if (player) score += player->GetLives() * 10000;
         gameOver = true;
         GameConfig::pendingMode = 1;
         GameConfig::pendingScore = score;

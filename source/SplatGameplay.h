@@ -20,20 +20,16 @@ class SplatGameplay : public Scene {
 private:
     SplatPlayer* player;
     bool gameOver;
-
     std::vector<int> waveCounts;
     int totalWaves;
     int activeEnemies;
-
     SDL_Texture* backgroundTexture;
     int score;
     int highScore;
     TextObject* scoreText;
     TextObject* livesText;
     TextObject* highScoreText;
-
     bool paused;
-
     bool showingWaveCompleted;
     float waveCompletedTimer;
     SDL_Texture* waveCompletedTex;
@@ -55,42 +51,31 @@ public:
     }
 
     void OnEnter() override {
-        if (paused)
-        {
+        if (paused) {
             paused = false;
             return;
         }
-
         gameOver = false;
         showingWaveCompleted = false;
         score = 0;
         activeEnemies = 0;
-
         backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
-
         RM.LoadTexture("resources/wavecompleted.png");
         waveCompletedTex = RM.GetTexture("resources/wavecompleted.png");
-
         AM.StopMusic();
         AM.PlaySong("splat_music");
-
         srand((unsigned)time(NULL));
-
         player = new SplatPlayer();
         SPAWN.SpawnObject(player);
-
         scoreText = new TextObject("", Vector2(0, 0), Vector2(150, 40), "SCORE: 000000");
         scoreText->GetTransform()->position = Vector2(120, 30);
         SPAWN.SpawnObject(scoreText);
-
         livesText = new TextObject("", Vector2(0, 0), Vector2(150, 40), "Lives: 3");
         livesText->GetTransform()->position = Vector2(680, 30);
         SPAWN.SpawnObject(livesText);
-
         highScoreText = new TextObject("", Vector2(0, 0), Vector2(200, 40), "High: 000000");
         highScoreText->GetTransform()->position = Vector2(1260, 30);
         SPAWN.SpawnObject(highScoreText);
-
         LoadWavesFromXML("resources/splat_waves.xml");
         if (!waveCounts.empty()) {
             totalWaves = (int)waveCounts.size();
@@ -99,8 +84,7 @@ public:
     }
 
     void OnExit() override {
-        if (SM.GetNextSceneName() == "SplatPause")
-        {
+        if (SM.GetNextSceneName() == "SplatPause") {
             paused = true;
             return;
         }
@@ -109,12 +93,10 @@ public:
     }
 
     void Update() override {
-        if (!gameOver && Input.GetEvent(SDLK_ESCAPE, DOWN))
-        {
+        if (!gameOver && Input.GetEvent(SDLK_ESCAPE, DOWN)) {
             SM.SetNextScene("SplatPause");
             return;
         }
-
         if (showingWaveCompleted) {
             waveCompletedTimer -= TIME.GetDeltaTime();
             if (waveCompletedTimer <= 0) {
@@ -123,9 +105,7 @@ public:
             }
             return;
         }
-
         UpdateHUD();
-
         for (int i = (int)objects.size() - 1; i >= 0; i--) {
             if (objects[i]->IsPendingDestroy()) {
                 if (Enemy* e = dynamic_cast<Enemy*>(objects[i])) {
@@ -136,21 +116,16 @@ public:
                 objects.erase(objects.begin() + i);
             }
         }
-
         while (SPAWN.GetSpawnedObjectsCount() > 0) {
             objects.push_back(SPAWN.GetSpawnedObject());
         }
-
         for (Object* o : objects) {
             o->Update();
         }
-
         CheckCollisions();
-
         if (player && !player->IsAlive() && !gameOver) {
             EndGame();
         }
-
         if (!gameOver && activeEnemies <= 0 && totalWaves > 0 && !showingWaveCompleted) {
             showingWaveCompleted = true;
             waveCompletedTimer = 2.0f;
@@ -163,15 +138,8 @@ public:
         for (Object* o : objects) {
             o->Render();
         }
-
         if (showingWaveCompleted && waveCompletedTex) {
-            int texW, texH;
-            SDL_QueryTexture(waveCompletedTex, NULL, NULL, &texW, &texH);
-            SDL_Rect dest = {
-                (int)((RM.WINDOW_WIDTH - texW) / 2),
-                (int)((RM.WINDOW_HEIGHT - texH) / 2),
-                texW, texH
-            };
+            SDL_Rect dest = { 0, 0, (int)RM.WINDOW_WIDTH, (int)RM.WINDOW_HEIGHT };
             SDL_RenderCopy(RM.GetRenderer(), waveCompletedTex, nullptr, &dest);
         }
     }
@@ -183,12 +151,8 @@ private:
             rapidxml::file<> xmlFile(filePath.c_str());
             rapidxml::xml_document<> doc;
             doc.parse<0>(xmlFile.data());
-
             rapidxml::xml_node<>* root = doc.first_node("waves");
-            if (!root) {
-                return;
-            }
-
+            if (!root) return;
             for (auto* waveNode = root->first_node("wave"); waveNode; waveNode = waveNode->next_sibling("wave")) {
                 int count = 0;
                 if (waveNode->first_attribute("count")) {
@@ -197,17 +161,14 @@ private:
                 waveCounts.push_back(count);
             }
         }
-        catch (std::exception& e) {
-        }
+        catch (...) {}
     }
 
     void SpawnRandomWave() {
         if (waveCounts.empty()) return;
         int randomIndex = rand() % waveCounts.size();
         int count = waveCounts[randomIndex];
-
         AM.PlayClip("tank_end_wave", 0);
-
         for (int i = 0; i < count; i++) {
             Vector2 pos((float)(rand() % RM.WINDOW_WIDTH), (float)(rand() % RM.WINDOW_HEIGHT));
             SPAWN.SpawnObject(new SplatBasicEnemy(pos));
@@ -230,9 +191,7 @@ private:
 
     void AddScore(int amount) {
         score += amount;
-        if (score > highScore) {
-            highScore = score;
-        }
+        if (score > highScore) highScore = score;
     }
 
     void UpdateHUD() {
@@ -254,9 +213,7 @@ private:
     }
 
     void EndGame() {
-        if (player) {
-            score += player->GetLives() * 10000;
-        }
+        if (player) score += player->GetLives() * 10000;
         gameOver = true;
         GameConfig::pendingMode = 2;
         GameConfig::pendingScore = score;
