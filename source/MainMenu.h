@@ -38,23 +38,28 @@ public:
         backgroundTex = RM.GetTexture("resources/mainmenu.png");
         AM.PlaySong("menu_music");
 
-        buttons.push_back(new Button("Space Invaders", 300, 50, 200, 40, font));
-        buttons.push_back(new Button("Tanks", 300, 110, 200, 40, font));
-        buttons.push_back(new Button("Splat!", 300, 170, 200, 40, font));
-        buttons.push_back(new Button("Asteroids", 300, 230, 200, 40, font));
-        buttons.push_back(new Button("Breakout", 300, 290, 200, 40, font));
-        buttons.push_back(new Button("Frogger", 300, 350, 200, 40, font));
-        buttons.push_back(new Button("Space Arena", 300, 410, 200, 40, font));
-        buttons.push_back(new Button("Scroller", 300, 470, 200, 40, font));
-        buttons.push_back(new Button("Flappy Ship", 300, 530, 200, 40, font));
-        buttons.push_back(new Button("Galactic", 300, 590, 200, 40, font));
-        buttons.push_back(new Button("Centipede", 300, 650, 200, 40, font));
+        // Columna Izquierda (Juegos 1-6) - Se apartan para no tapar el letrero central
+        buttons.push_back(new Button("Space Invaders", 80, 60, 250, 40, font));
+        buttons.push_back(new Button("Tanks", 80, 120, 250, 40, font));
+        buttons.push_back(new Button("Splat!", 80, 180, 250, 40, font));
+        buttons.push_back(new Button("Asteroids", 80, 240, 250, 40, font));
+        buttons.push_back(new Button("Breakout", 80, 300, 250, 40, font));
+        buttons.push_back(new Button("Frogger", 80, 360, 250, 40, font));
 
-        buttons.push_back(new Button("Select Sprites", 800, 250, 200, 40, font));
-        buttons.push_back(new Button("Check Ranking", 800, 310, 200, 40, font));
+        // Columna Derecha (Juegos 7-12)
+        buttons.push_back(new Button("Space Arena", 1030, 60, 250, 40, font));
+        buttons.push_back(new Button("Scroller", 1030, 120, 250, 40, font));
+        buttons.push_back(new Button("Flappy Ship", 1030, 180, 250, 40, font));
+        buttons.push_back(new Button("Galactic", 1030, 240, 250, 40, font));
+        buttons.push_back(new Button("Centipede", 1030, 300, 250, 40, font));
+        buttons.push_back(new Button("Pac-Man", 1030, 360, 250, 40, font));
+
+        // Columna Central (Utilidades) - Bajan debajo de la pantalla de "MAIN MENU"
+        buttons.push_back(new Button("Select Sprites", 555, 400, 250, 40, font));
+        buttons.push_back(new Button("Check Ranking", 555, 460, 250, 40, font));
         std::string audioLabel = AM.GetMuted() ? "Audio Disabled" : "Audio Enabled";
-        buttons.push_back(new Button(audioLabel, 800, 370, 200, 40, font));
-        buttons.push_back(new Button("Exit", 800, 430, 200, 40, font));
+        buttons.push_back(new Button(audioLabel, 555, 520, 250, 40, font));
+        buttons.push_back(new Button("Exit", 555, 580, 250, 40, font));
     }
 
     void OnExit() override {
@@ -108,6 +113,7 @@ public:
         else if (label == "Flappy Ship") PrepareSceneChange("Flappy");
         else if (label == "Galactic") PrepareSceneChange("Galactic");
         else if (label == "Centipede") PrepareSceneChange("Centipede");
+        else if (label == "Pac-Man") PrepareSceneChange("Pacman");
         else if (label == "Select Sprites") PrepareSceneChange("SpriteSelector");
         else if (label == "Check Ranking") PrepareSceneChange("RankingScene");
         else if (label == "Audio Enabled" || label == "Audio Disabled") {

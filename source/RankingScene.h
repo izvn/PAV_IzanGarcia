@@ -29,6 +29,7 @@ private:
     ScoreRecord flappyScores[10];
     ScoreRecord galacticScores[10];
     ScoreRecord centipedeScores[10];
+    ScoreRecord pacmanScores[10];
 
     Button* btnBack;
     TTF_Font* fontTitle;
@@ -39,7 +40,7 @@ private:
     struct GameHeader {
         SDL_Texture* tex;
         int w, h;
-    } headers[11];
+    } headers[12];
 
     SDL_Texture* backgroundTexture;
 
@@ -48,7 +49,7 @@ public:
         : btnBack(nullptr), fontTitle(nullptr), fontScores(nullptr), titleTexture(nullptr), titleW(0), titleH(0),
         backgroundTexture(nullptr)
     {
-        for (int i = 0; i < 11; i++) headers[i] = { nullptr, 0, 0 };
+        for (int i = 0; i < 12; i++) headers[i] = { nullptr, 0, 0 };
         for (int i = 0; i < 10; i++) {
             strcpy_s(spaceScores[i].name, sizeof(spaceScores[i].name), "---"); spaceScores[i].score = 0;
             strcpy_s(tanksScores[i].name, sizeof(tanksScores[i].name), "---"); tanksScores[i].score = 0;
@@ -61,6 +62,7 @@ public:
             strcpy_s(flappyScores[i].name, sizeof(flappyScores[i].name), "---"); flappyScores[i].score = 0;
             strcpy_s(galacticScores[i].name, sizeof(galacticScores[i].name), "---"); galacticScores[i].score = 0;
             strcpy_s(centipedeScores[i].name, sizeof(centipedeScores[i].name), "---"); centipedeScores[i].score = 0;
+            strcpy_s(pacmanScores[i].name, sizeof(pacmanScores[i].name), "---"); pacmanScores[i].score = 0;
         }
     }
 
@@ -85,17 +87,18 @@ public:
         headers[8].tex = CreateTextTexture("FLAPPY SHIP", fontScores, &headers[8].w, &headers[8].h);
         headers[9].tex = CreateTextTexture("GALACTIC", fontScores, &headers[9].w, &headers[9].h);
         headers[10].tex = CreateTextTexture("CENTIPEDE", fontScores, &headers[10].w, &headers[10].h);
+        headers[11].tex = CreateTextTexture("PAC-MAN", fontScores, &headers[11].w, &headers[11].h);
 
         LoadScoresFromFile();
 
         RM.LoadFont("resources/fonts/fuente.otf", 24);
-        btnBack = new Button("Back to Menu", (1360 - 220) / 2, 650, 220, 45, RM.GetFont("resources/fonts/fuente.otf"));
+        btnBack = new Button("Back to Menu", (1360 - 220) / 2, 680, 220, 45, RM.GetFont("resources/fonts/fuente.otf"));
     }
 
     void OnExit() override {
         SaveScoresToFile();
         if (titleTexture) SDL_DestroyTexture(titleTexture);
-        for (int i = 0; i < 11; i++) {
+        for (int i = 0; i < 12; i++) {
             if (headers[i].tex) SDL_DestroyTexture(headers[i].tex);
         }
         if (btnBack) { delete btnBack; btnBack = nullptr; }
@@ -111,20 +114,21 @@ public:
         SDL_RenderCopy(RM.GetRenderer(), backgroundTexture, nullptr, nullptr);
         RenderTexture(titleTexture, (1360 - titleW) / 2, 20, titleW, titleH);
 
+        // Fila 1
         int row1Y = 100;
-        int colWidth1 = 1360 / 6;
+        int colWidth = 1360 / 6;
         for (int i = 0; i < 6; i++) {
-            int x = i * colWidth1 + colWidth1 / 2;
+            int x = i * colWidth + colWidth / 2;
             RenderTexture(headers[i].tex, x, row1Y, 0, 0, true);
-            RenderTop5(GetArrayByMode(i), x, row1Y + 40);
+            RenderTop5(GetArrayByMode(i), x, row1Y + 35);
         }
 
+        // Fila 2
         int row2Y = 380;
-        int colWidth2 = 1360 / 5;
-        for (int i = 6; i < 11; i++) {
-            int x = (i - 6) * colWidth2 + colWidth2 / 2;
+        for (int i = 6; i < 12; i++) {
+            int x = (i - 6) * colWidth + colWidth / 2;
             RenderTexture(headers[i].tex, x, row2Y, 0, 0, true);
-            RenderTop5(GetArrayByMode(i), x, row2Y + 40);
+            RenderTop5(GetArrayByMode(i), x, row2Y + 35);
         }
 
         btnBack->Render();
@@ -160,7 +164,7 @@ public:
     }
 
     void SaveScoresToFile() {
-        std::ofstream file("resources/highscores_v10.bin", std::ios::binary | std::ios::trunc);
+        std::ofstream file("resources/highscores_v11.bin", std::ios::binary | std::ios::trunc);
         if (!file.is_open()) return;
         file.write(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
         file.write(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
@@ -173,6 +177,7 @@ public:
         file.write(reinterpret_cast<char*>(flappyScores), sizeof(flappyScores));
         file.write(reinterpret_cast<char*>(galacticScores), sizeof(galacticScores));
         file.write(reinterpret_cast<char*>(centipedeScores), sizeof(centipedeScores));
+        file.write(reinterpret_cast<char*>(pacmanScores), sizeof(pacmanScores));
         file.close();
     }
 
@@ -182,7 +187,7 @@ private:
         case 0: return spaceScores; case 1: return tanksScores; case 2: return splatScores;
         case 3: return asteroidsScores; case 4: return breakoutScores; case 5: return froggerScores;
         case 6: return arenaScores; case 7: return scrollerScores; case 8: return flappyScores;
-        case 9: return galacticScores; case 10: return centipedeScores;
+        case 9: return galacticScores; case 10: return centipedeScores; case 11: return pacmanScores;
         default: return nullptr;
         }
     }
@@ -200,8 +205,25 @@ private:
     }
 
     void LoadScoresFromFile() {
-        std::ifstream file("resources/highscores_v10.bin", std::ios::binary);
-        if (!file.is_open()) return;
+        std::ifstream file("resources/highscores_v11.bin", std::ios::binary);
+        if (!file.is_open()) {
+            std::ifstream fileOld("resources/highscores_v10.bin", std::ios::binary);
+            if (fileOld.is_open()) {
+                fileOld.read(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
+                fileOld.read(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
+                fileOld.read(reinterpret_cast<char*>(splatScores), sizeof(splatScores));
+                fileOld.read(reinterpret_cast<char*>(asteroidsScores), sizeof(asteroidsScores));
+                fileOld.read(reinterpret_cast<char*>(breakoutScores), sizeof(breakoutScores));
+                fileOld.read(reinterpret_cast<char*>(froggerScores), sizeof(froggerScores));
+                fileOld.read(reinterpret_cast<char*>(arenaScores), sizeof(arenaScores));
+                fileOld.read(reinterpret_cast<char*>(scrollerScores), sizeof(scrollerScores));
+                fileOld.read(reinterpret_cast<char*>(flappyScores), sizeof(flappyScores));
+                fileOld.read(reinterpret_cast<char*>(galacticScores), sizeof(galacticScores));
+                fileOld.read(reinterpret_cast<char*>(centipedeScores), sizeof(centipedeScores));
+                fileOld.close();
+            }
+            return;
+        }
         file.read(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
         file.read(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
         file.read(reinterpret_cast<char*>(splatScores), sizeof(splatScores));
@@ -213,6 +235,7 @@ private:
         file.read(reinterpret_cast<char*>(flappyScores), sizeof(flappyScores));
         file.read(reinterpret_cast<char*>(galacticScores), sizeof(galacticScores));
         file.read(reinterpret_cast<char*>(centipedeScores), sizeof(centipedeScores));
+        file.read(reinterpret_cast<char*>(pacmanScores), sizeof(pacmanScores));
         file.close();
     }
 
