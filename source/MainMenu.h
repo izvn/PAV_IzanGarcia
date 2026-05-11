@@ -48,6 +48,7 @@ public:
         buttons.push_back(new Button("Scroller", 300, 470, 200, 40, font));
         buttons.push_back(new Button("Flappy Ship", 300, 530, 200, 40, font));
         buttons.push_back(new Button("Galactic", 300, 590, 200, 40, font));
+        buttons.push_back(new Button("Centipede", 300, 650, 200, 40, font));
 
         buttons.push_back(new Button("Select Sprites", 800, 250, 200, 40, font));
         buttons.push_back(new Button("Check Ranking", 800, 310, 200, 40, font));
@@ -106,6 +107,7 @@ public:
         else if (label == "Scroller") PrepareSceneChange("Scroller");
         else if (label == "Flappy Ship") PrepareSceneChange("Flappy");
         else if (label == "Galactic") PrepareSceneChange("Galactic");
+        else if (label == "Centipede") PrepareSceneChange("Centipede");
         else if (label == "Select Sprites") PrepareSceneChange("SpriteSelector");
         else if (label == "Check Ranking") PrepareSceneChange("RankingScene");
         else if (label == "Audio Enabled" || label == "Audio Disabled") {

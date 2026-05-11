@@ -26,6 +26,8 @@
 #include "FlappyPauseScene.h"
 #include "GalacticGameplay.h"
 #include "GalacticPauseScene.h"
+#include "CentipedeGameplay.h"
+#include "CentipedePauseScene.h"
 #include "GameOverScene.h"
 
 void Game::Init() {
@@ -127,6 +129,7 @@ void Game::Init() {
     SM.AddScene("Scroller", new ScrollerGameplay());
     SM.AddScene("Flappy", new FlappyGameplay());
     SM.AddScene("Galactic", new GalacticGameplay());
+    SM.AddScene("Centipede", new CentipedeGameplay());
 
     SM.AddScene("SpaceInvadersPause", new SpaceInvadersPauseScene());
     SM.AddScene("TanksPause", new TanksPauseScene());
@@ -138,6 +141,7 @@ void Game::Init() {
     SM.AddScene("ScrollerPause", new ScrollerPauseScene());
     SM.AddScene("FlappyPause", new FlappyPauseScene());
     SM.AddScene("GalacticPause", new GalacticPauseScene());
+    SM.AddScene("CentipedePause", new CentipedePauseScene());
     SM.AddScene("GameOver", new GameOverScene());
 
     SM.InitFirstScene("SplashScreen");

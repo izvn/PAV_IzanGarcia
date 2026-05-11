@@ -49,6 +49,12 @@
     <ClInclude Include="source\Bullet.h" />
     <ClInclude Include="source\BulletAimingEnemy.h" />
     <ClInclude Include="source\Button.h" />
+    <ClInclude Include="source\CentipedeGameplay.h" />
+    <ClInclude Include="source\CentipedeMushroom.h" />
+    <ClInclude Include="source\CentipedePauseScene.h" />
+    <ClInclude Include="source\CentipedePlayer.h" />
+    <ClInclude Include="source\CentipedePlayerBullet.h" />
+    <ClInclude Include="source\CentipedeSegment.h" />
     <ClInclude Include="source\Enemy.h" />
     <ClInclude Include="source\EnemyBullet.h" />
     <ClInclude Include="source\ExplodingEnemy.h" />
