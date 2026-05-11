@@ -26,9 +26,9 @@ private:
     ScoreRecord arenaScores[10];
     ScoreRecord scrollerScores[10];
     ScoreRecord flappyScores[10];
+    ScoreRecord galacticScores[10];
 
     Button* btnBack;
-
     TTF_Font* fontTitle;
     SDL_Texture* titleTexture;
     int titleW, titleH;
@@ -42,12 +42,13 @@ private:
     SDL_Texture* arenaTitleTex;
     SDL_Texture* scrollerTitleTex;
     SDL_Texture* flappyTitleTex;
+    SDL_Texture* galacticTitleTex;
 
     int spaceTitleW, spaceTitleH, tanksTitleW, tanksTitleH;
     int splatTitleW, splatTitleH, asteroidsTitleW, asteroidsTitleH;
     int breakoutTitleW, breakoutTitleH, froggerTitleW, froggerTitleH;
     int arenaTitleW, arenaTitleH, scrollerTitleW, scrollerTitleH;
-    int flappyTitleW, flappyTitleH;
+    int flappyTitleW, flappyTitleH, galacticTitleW, galacticTitleH;
 
     SDL_Texture* backgroundTexture;
 
@@ -55,7 +56,7 @@ public:
     RankingScene()
         : btnBack(nullptr), fontTitle(nullptr), titleTexture(nullptr), titleW(0), titleH(0),
         spaceTitleTex(nullptr), tanksTitleTex(nullptr), splatTitleTex(nullptr), asteroidsTitleTex(nullptr),
-        breakoutTitleTex(nullptr), froggerTitleTex(nullptr), arenaTitleTex(nullptr), scrollerTitleTex(nullptr), flappyTitleTex(nullptr),
+        breakoutTitleTex(nullptr), froggerTitleTex(nullptr), arenaTitleTex(nullptr), scrollerTitleTex(nullptr), flappyTitleTex(nullptr), galacticTitleTex(nullptr),
         backgroundTexture(nullptr)
     {
         for (int i = 0; i < 10; i++) {
@@ -68,13 +69,14 @@ public:
             strcpy_s(arenaScores[i].name, sizeof(arenaScores[i].name), "---"); arenaScores[i].score = 0;
             strcpy_s(scrollerScores[i].name, sizeof(scrollerScores[i].name), "---"); scrollerScores[i].score = 0;
             strcpy_s(flappyScores[i].name, sizeof(flappyScores[i].name), "---"); flappyScores[i].score = 0;
+            strcpy_s(galacticScores[i].name, sizeof(galacticScores[i].name), "---"); galacticScores[i].score = 0;
         }
     }
 
     void OnEnter() override {
         backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
 
-        RM.LoadFont("resources/fonts/fuente.otf", 20);
+        RM.LoadFont("resources/fonts/fuente.otf", 18);
         fontTitle = RM.GetFont("resources/fonts/fuente.otf");
 
         titleTexture = CreateTextTexture("RANKING", fontTitle, &titleW, &titleH);
@@ -87,6 +89,7 @@ public:
         arenaTitleTex = CreateTextTexture("Arena", fontTitle, &arenaTitleW, &arenaTitleH);
         scrollerTitleTex = CreateTextTexture("Scroller", fontTitle, &scrollerTitleW, &scrollerTitleH);
         flappyTitleTex = CreateTextTexture("Flappy", fontTitle, &flappyTitleW, &flappyTitleH);
+        galacticTitleTex = CreateTextTexture("Galactic", fontTitle, &galacticTitleW, &galacticTitleH);
 
         LoadScoresFromFile();
 
@@ -108,6 +111,7 @@ public:
         if (arenaTitleTex) SDL_DestroyTexture(arenaTitleTex);
         if (scrollerTitleTex) SDL_DestroyTexture(scrollerTitleTex);
         if (flappyTitleTex) SDL_DestroyTexture(flappyTitleTex);
+        if (galacticTitleTex) SDL_DestroyTexture(galacticTitleTex);
         if (btnBack) { delete btnBack; btnBack = nullptr; }
         Scene::OnExit();
     }
@@ -124,7 +128,7 @@ public:
 
         RenderTexture(titleTexture, (1360 - titleW) / 2, 10, titleW, titleH);
 
-        int cols[9] = { 20, 160, 300, 440, 580, 720, 860, 1000, 1140 };
+        int cols[10] = { 20, 150, 280, 410, 540, 670, 800, 930, 1060, 1190 };
         int topY = 70;
 
         RenderTexture(spaceTitleTex, cols[0], topY, spaceTitleW, spaceTitleH);
@@ -136,6 +140,7 @@ public:
         RenderTexture(arenaTitleTex, cols[6], topY, arenaTitleW, arenaTitleH);
         RenderTexture(scrollerTitleTex, cols[7], topY, scrollerTitleW, scrollerTitleH);
         RenderTexture(flappyTitleTex, cols[8], topY, flappyTitleW, flappyTitleH);
+        RenderTexture(galacticTitleTex, cols[9], topY, galacticTitleW, galacticTitleH);
 
         int rowY = topY + 40;
         for (int i = 0; i < 10; i++) {
@@ -148,6 +153,7 @@ public:
             RenderScore(arenaScores[i], cols[6], rowY + i * 40);
             RenderScore(scrollerScores[i], cols[7], rowY + i * 40);
             RenderScore(flappyScores[i], cols[8], rowY + i * 40);
+            RenderScore(galacticScores[i], cols[9], rowY + i * 40);
         }
 
         btnBack->Render();
@@ -165,6 +171,7 @@ public:
         else if (mode == 6) arr = arenaScores;
         else if (mode == 7) arr = scrollerScores;
         else if (mode == 8) arr = flappyScores;
+        else if (mode == 9) arr = galacticScores;
 
         std::vector<ScoreRecord> temp(arr, arr + 10);
         ScoreRecord newRecord;
@@ -192,9 +199,9 @@ public:
 
 private:
     void LoadScoresFromFile() {
-        std::ifstream file("resources/highscores_v8.bin", std::ios::binary);
+        std::ifstream file("resources/highscores_v9.bin", std::ios::binary);
         if (!file.is_open()) {
-            std::ifstream fileOld("resources/highscores_v7.bin", std::ios::binary);
+            std::ifstream fileOld("resources/highscores_v8.bin", std::ios::binary);
             if (fileOld.is_open()) {
                 fileOld.read(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
                 fileOld.read(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
@@ -204,6 +211,7 @@ private:
                 fileOld.read(reinterpret_cast<char*>(froggerScores), sizeof(froggerScores));
                 fileOld.read(reinterpret_cast<char*>(arenaScores), sizeof(arenaScores));
                 fileOld.read(reinterpret_cast<char*>(scrollerScores), sizeof(scrollerScores));
+                fileOld.read(reinterpret_cast<char*>(flappyScores), sizeof(flappyScores));
                 fileOld.close();
             }
             return;
@@ -217,11 +225,12 @@ private:
         file.read(reinterpret_cast<char*>(arenaScores), sizeof(arenaScores));
         file.read(reinterpret_cast<char*>(scrollerScores), sizeof(scrollerScores));
         file.read(reinterpret_cast<char*>(flappyScores), sizeof(flappyScores));
+        file.read(reinterpret_cast<char*>(galacticScores), sizeof(galacticScores));
         file.close();
     }
 
     void SaveScoresToFile() {
-        std::ofstream file("resources/highscores_v8.bin", std::ios::binary | std::ios::trunc);
+        std::ofstream file("resources/highscores_v9.bin", std::ios::binary | std::ios::trunc);
         if (!file.is_open()) return;
         file.write(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
         file.write(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
@@ -232,6 +241,7 @@ private:
         file.write(reinterpret_cast<char*>(arenaScores), sizeof(arenaScores));
         file.write(reinterpret_cast<char*>(scrollerScores), sizeof(scrollerScores));
         file.write(reinterpret_cast<char*>(flappyScores), sizeof(flappyScores));
+        file.write(reinterpret_cast<char*>(galacticScores), sizeof(galacticScores));
         file.close();
     }
 

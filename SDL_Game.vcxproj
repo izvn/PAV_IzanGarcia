@@ -61,6 +61,11 @@
     <ClInclude Include="source\FroggerGameplay.h" />
     <ClInclude Include="source\FroggerPauseScene.h" />
     <ClInclude Include="source\FroggerPlayer.h" />
+    <ClInclude Include="source\GalacticEnemy.h" />
+    <ClInclude Include="source\GalacticGameplay.h" />
+    <ClInclude Include="source\GalacticPauseScene.h" />
+    <ClInclude Include="source\GalacticPlayer.h" />
+    <ClInclude Include="source\GalacticPlayerBullet.h" />
     <ClInclude Include="source\Game.h" />
     <ClInclude Include="source\GameConfig.h" />
     <ClInclude Include="source\GameObject.h" />

@@ -13,14 +13,11 @@ private:
     SDL_Texture* backgroundTex;
     TTF_Font* font;
     TTF_Font* titleFont;
-
     float audioCooldownTimer;
     const float audioCooldownDuration = 0.5f;
     bool canToggleAudio;
-
     bool changeScenePending;
     std::string pendingScene;
-
     float sceneChangeDelay;
     const float delayDuration = 0.3f;
 
@@ -34,28 +31,24 @@ public:
     void OnEnter() override {
         changeScenePending = false;
         sceneChangeDelay = 0.0f;
-
         RM.LoadFont("resources/fonts/fuente.otf", 24);
         font = RM.GetFont("resources/fonts/fuente.otf");
         RM.LoadFont("resources/fonts/fuente.otf", 48);
         titleFont = RM.GetFont("resources/fonts/fuente.otf");
-
         backgroundTex = RM.GetTexture("resources/mainmenu.png");
-
         AM.PlaySong("menu_music");
 
-        // Columna 1: Juegos
-        buttons.push_back(new Button("Space Invaders", 300, 100, 200, 40, font));
-        buttons.push_back(new Button("Tanks", 300, 160, 200, 40, font));
-        buttons.push_back(new Button("Splat!", 300, 220, 200, 40, font));
-        buttons.push_back(new Button("Asteroids", 300, 280, 200, 40, font));
-        buttons.push_back(new Button("Breakout", 300, 340, 200, 40, font));
-        buttons.push_back(new Button("Frogger", 300, 400, 200, 40, font));
-        buttons.push_back(new Button("Space Arena", 300, 460, 200, 40, font));
-        buttons.push_back(new Button("Scroller", 300, 520, 200, 40, font));
-        buttons.push_back(new Button("Flappy Ship", 300, 580, 200, 40, font));
+        buttons.push_back(new Button("Space Invaders", 300, 50, 200, 40, font));
+        buttons.push_back(new Button("Tanks", 300, 110, 200, 40, font));
+        buttons.push_back(new Button("Splat!", 300, 170, 200, 40, font));
+        buttons.push_back(new Button("Asteroids", 300, 230, 200, 40, font));
+        buttons.push_back(new Button("Breakout", 300, 290, 200, 40, font));
+        buttons.push_back(new Button("Frogger", 300, 350, 200, 40, font));
+        buttons.push_back(new Button("Space Arena", 300, 410, 200, 40, font));
+        buttons.push_back(new Button("Scroller", 300, 470, 200, 40, font));
+        buttons.push_back(new Button("Flappy Ship", 300, 530, 200, 40, font));
+        buttons.push_back(new Button("Galactic", 300, 590, 200, 40, font));
 
-        // Columna 2: Opciones
         buttons.push_back(new Button("Select Sprites", 800, 250, 200, 40, font));
         buttons.push_back(new Button("Check Ranking", 800, 310, 200, 40, font));
         std::string audioLabel = AM.GetMuted() ? "Audio Disabled" : "Audio Enabled";
@@ -79,7 +72,6 @@ public:
                 audioCooldownTimer = 0.0f;
             }
         }
-
         if (changeScenePending) {
             sceneChangeDelay -= TIME.GetDeltaTime();
             if (sceneChangeDelay <= 0.0f) {
@@ -87,7 +79,6 @@ public:
                 return;
             }
         }
-
         for (auto* b : buttons) {
             b->Update();
             if (b->IsClicked() && !changeScenePending) {
@@ -114,6 +105,7 @@ public:
         else if (label == "Space Arena") PrepareSceneChange("Arena");
         else if (label == "Scroller") PrepareSceneChange("Scroller");
         else if (label == "Flappy Ship") PrepareSceneChange("Flappy");
+        else if (label == "Galactic") PrepareSceneChange("Galactic");
         else if (label == "Select Sprites") PrepareSceneChange("SpriteSelector");
         else if (label == "Check Ranking") PrepareSceneChange("RankingScene");
         else if (label == "Audio Enabled" || label == "Audio Disabled") {
