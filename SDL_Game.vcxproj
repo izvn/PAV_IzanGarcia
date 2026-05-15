@@ -83,12 +83,6 @@
     <ClInclude Include="source\InputManager.h" />
     <ClInclude Include="source\MainMenu.h" />
     <ClInclude Include="source\Object.h" />
-    <ClInclude Include="source\PacmanDot.h" />
-    <ClInclude Include="source\PacmanGameplay.h" />
-    <ClInclude Include="source\PacmanGhost.h" />
-    <ClInclude Include="source\PacmanPauseScene.h" />
-    <ClInclude Include="source\PacmanPlayer.h" />
-    <ClInclude Include="source\PacmanWall.h" />
     <ClInclude Include="source\Player.h" />
     <ClInclude Include="source\RankingScene.h" />
     <ClInclude Include="source\Renderer.h" />
@@ -124,6 +118,11 @@
     <ClInclude Include="source\Transform.h" />
     <ClInclude Include="source\Vector2.h" />
     <ClInclude Include="source\TestObject.h" />
+    <ClInclude Include="source\VortexBullet.h" />
+    <ClInclude Include="source\VortexEnemy.h" />
+    <ClInclude Include="source\VortexGameplay.h" />
+    <ClInclude Include="source\VortexPauseScene.h" />
+    <ClInclude Include="source\VortexPlayer.h" />
     <ClInclude Include="source\WaveManager.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

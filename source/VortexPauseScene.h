@@ -7,9 +7,9 @@
 #include "InputManager.h"
 #include <SDL_ttf.h>
 #include "GameConfig.h"
-#include "PacmanGameplay.h"
+#include "VortexGameplay.h"
 
-class PacmanPauseScene : public Scene
+class VortexPauseScene : public Scene
 {
 private:
     Button* btnResume = nullptr;
@@ -17,8 +17,8 @@ private:
     TTF_Font* font = nullptr;
 
 public:
-    PacmanPauseScene() = default;
-    ~PacmanPauseScene() override = default;
+    VortexPauseScene() = default;
+    ~VortexPauseScene() override = default;
 
     void OnEnter() override
     {
@@ -47,7 +47,7 @@ public:
     {
         if (Input.GetEvent(SDLK_ESCAPE, DOWN))
         {
-            PacmanGameplay* g = dynamic_cast<PacmanGameplay*>(SM.GetScene("Pacman"));
+            VortexGameplay* g = dynamic_cast<VortexGameplay*>(SM.GetScene("Vortex"));
             if (g) g->ForceCleanup();
             SM.SetNextScene("MainMenu");
             return;
@@ -57,7 +57,7 @@ public:
 
         if (btnResume && btnResume->IsClicked())
         {
-            SM.SetNextScene("Pacman");
+            SM.SetNextScene("Vortex");
             return;
         }
     }

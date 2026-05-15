@@ -38,7 +38,6 @@ public:
         backgroundTex = RM.GetTexture("resources/mainmenu.png");
         AM.PlaySong("menu_music");
 
-        // Columna Izquierda (Juegos 1-6) - Se apartan para no tapar el letrero central
         buttons.push_back(new Button("Space Invaders", 80, 60, 250, 40, font));
         buttons.push_back(new Button("Tanks", 80, 120, 250, 40, font));
         buttons.push_back(new Button("Splat!", 80, 180, 250, 40, font));
@@ -46,16 +45,14 @@ public:
         buttons.push_back(new Button("Breakout", 80, 300, 250, 40, font));
         buttons.push_back(new Button("Frogger", 80, 360, 250, 40, font));
 
-        // Columna Derecha (Juegos 7-12)
         buttons.push_back(new Button("Space Arena", 1030, 60, 250, 40, font));
         buttons.push_back(new Button("Scroller", 1030, 120, 250, 40, font));
         buttons.push_back(new Button("Flappy Ship", 1030, 180, 250, 40, font));
         buttons.push_back(new Button("Galactic", 1030, 240, 250, 40, font));
         buttons.push_back(new Button("Centipede", 1030, 300, 250, 40, font));
-        buttons.push_back(new Button("Pac-Man", 1030, 360, 250, 40, font));
+        buttons.push_back(new Button("Vortex", 1030, 360, 250, 40, font));
 
-        // Columna Central (Utilidades) - Bajan debajo de la pantalla de "MAIN MENU"
-        buttons.push_back(new Button("Select Sprites", 555, 400, 250, 40, font));
+        buttons.push_back(new Button("Select Background", 555, 400, 250, 40, font)); // <-- Cambiado el nombre
         buttons.push_back(new Button("Check Ranking", 555, 460, 250, 40, font));
         std::string audioLabel = AM.GetMuted() ? "Audio Disabled" : "Audio Enabled";
         buttons.push_back(new Button(audioLabel, 555, 520, 250, 40, font));
@@ -113,8 +110,8 @@ public:
         else if (label == "Flappy Ship") PrepareSceneChange("Flappy");
         else if (label == "Galactic") PrepareSceneChange("Galactic");
         else if (label == "Centipede") PrepareSceneChange("Centipede");
-        else if (label == "Pac-Man") PrepareSceneChange("Pacman");
-        else if (label == "Select Sprites") PrepareSceneChange("SpriteSelector");
+        else if (label == "Vortex") PrepareSceneChange("Vortex");
+        else if (label == "Select Background") PrepareSceneChange("SpriteSelector"); // <-- Apunta a la misma escena
         else if (label == "Check Ranking") PrepareSceneChange("RankingScene");
         else if (label == "Audio Enabled" || label == "Audio Disabled") {
             if (AM.GetMuted()) {

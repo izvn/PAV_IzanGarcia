@@ -311,22 +311,19 @@
     <ClInclude Include="source\CentipedePauseScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\PacmanWall.h">
+    <ClInclude Include="source\VortexBullet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\PacmanDot.h">
+    <ClInclude Include="source\VortexPlayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\PacmanPlayer.h">
+    <ClInclude Include="source\VortexEnemy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\PacmanGhost.h">
+    <ClInclude Include="source\VortexGameplay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\PacmanGameplay.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\PacmanPauseScene.h">
+    <ClInclude Include="source\VortexPauseScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

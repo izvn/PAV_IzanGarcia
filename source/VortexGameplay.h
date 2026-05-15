@@ -1,0 +1,208 @@
+#pragma once
+#include "Scene.h"
+#include "VortexPlayer.h"
+#include "VortexEnemy.h"
+#include "AudioManager.h"
+#include "RenderManager.h"
+#include "GameConfig.h"
+#include "TextObject.h"
+#include "RankingScene.h"
+#include "SceneManager.h"
+#include <cstdlib>
+#include <vector>
+#include <cmath>
+
+class VortexGameplay : public Scene {
+private:
+    VortexPlayer* player;
+    bool gameOver;
+    float spawnTimer;
+    float spawnInterval;
+    int difficultyLevel;
+    float difficultyTimer;
+    SDL_Texture* backgroundTexture;
+    int score;
+    int highScore;
+    TextObject* scoreText;
+    TextObject* livesText;
+    TextObject* highScoreText;
+    bool paused;
+
+public:
+    VortexGameplay()
+        : Scene(), player(nullptr), gameOver(false), spawnTimer(0), spawnInterval(1.5f),
+        difficultyLevel(1), difficultyTimer(0), backgroundTexture(nullptr),
+        score(0), highScore(0), scoreText(nullptr), livesText(nullptr),
+        highScoreText(nullptr), paused(false) {
+    }
+
+    void ForceCleanup() {
+        paused = false;
+        Scene::OnExit();
+    }
+
+    void OnEnter() override {
+        if (paused) {
+            paused = false;
+            return;
+        }
+
+        gameOver = false;
+        score = 0;
+        difficultyLevel = 1;
+        spawnInterval = 1.2f;
+        spawnTimer = 1.0f;
+        difficultyTimer = 0.0f;
+
+        backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
+
+        AM.StopMusic();
+        AM.PlaySong("tank_music");
+
+        srand((unsigned)time(NULL));
+
+        player = new VortexPlayer();
+        SPAWN.SpawnObject(player);
+
+        scoreText = new TextObject("", Vector2(0, 0), Vector2(150, 40), "SCORE: 000000");
+        scoreText->GetTransform()->position = Vector2(120, 30);
+        SPAWN.SpawnObject(scoreText);
+
+        livesText = new TextObject("", Vector2(0, 0), Vector2(150, 40), "Lives: 3");
+        livesText->GetTransform()->position = Vector2(680, 30);
+        SPAWN.SpawnObject(livesText);
+
+        highScoreText = new TextObject("", Vector2(0, 0), Vector2(200, 40), "High: 000000");
+        highScoreText->GetTransform()->position = Vector2(1260, 30);
+        SPAWN.SpawnObject(highScoreText);
+    }
+
+    void OnExit() override {
+        if (SM.GetNextSceneName() == "VortexPause") {
+            paused = true;
+            return;
+        }
+        AM.StopMusic();
+        Scene::OnExit();
+    }
+
+    void Update() override {
+        if (!gameOver && Input.GetEvent(SDLK_ESCAPE, DOWN)) {
+            SM.SetNextScene("VortexPause");
+            return;
+        }
+
+        UpdateHUD();
+
+        if (!gameOver) {
+            float dt = TIME.GetDeltaTime();
+            difficultyTimer += dt;
+            if (difficultyTimer >= 10.0f) {
+                difficultyTimer = 0.0f;
+                difficultyLevel++;
+                spawnInterval = std::fmax(0.2f, spawnInterval - 0.10f);
+            }
+
+            spawnTimer -= dt;
+            if (spawnTimer <= 0.0f) {
+                int enemiesToSpawn = 1 + (difficultyLevel / 3);
+                for (int i = 0; i < enemiesToSpawn; i++) {
+                    SpawnEnemy();
+                }
+                spawnTimer = spawnInterval;
+            }
+        }
+
+        for (int i = (int)objects.size() - 1; i >= 0; i--) {
+            if (objects[i]->IsPendingDestroy()) {
+                if (Enemy* e = dynamic_cast<Enemy*>(objects[i])) {
+                    AddScore(50);
+                }
+                delete objects[i];
+                objects.erase(objects.begin() + i);
+            }
+        }
+
+        while (SPAWN.GetSpawnedObjectsCount() > 0) {
+            objects.push_back(SPAWN.GetSpawnedObject());
+        }
+
+        for (Object* o : objects) {
+            o->Update();
+        }
+
+        CheckCollisions();
+
+        if (player && !player->IsAlive() && !gameOver) {
+            EndGame();
+        }
+    }
+
+    void Render() override {
+        if (backgroundTexture) {
+            SDL_RenderCopy(RM.GetRenderer(), backgroundTexture, nullptr, nullptr);
+        }
+        for (Object* o : objects) {
+            o->Render();
+        }
+    }
+
+private:
+    void SpawnEnemy() {
+        int edge = rand() % 4;
+        Vector2 pos;
+        float pad = 32.0f;
+
+        if (edge == 0) pos = Vector2((float)(rand() % RM.WINDOW_WIDTH), pad);
+        else if (edge == 1) pos = Vector2((float)(rand() % RM.WINDOW_WIDTH), RM.WINDOW_HEIGHT - pad);
+        else if (edge == 2) pos = Vector2(pad, (float)(rand() % RM.WINDOW_HEIGHT));
+        else pos = Vector2(RM.WINDOW_WIDTH - pad, (float)(rand() % RM.WINDOW_HEIGHT));
+
+        float speed = 100.0f + (difficultyLevel * 10.0f) + (rand() % 40);
+        SPAWN.SpawnObject(new VortexEnemy(pos, speed));
+    }
+
+    void CheckCollisions() {
+        for (int i = 0; i < (int)objects.size(); i++) {
+            for (int j = i + 1; j < (int)objects.size(); j++) {
+                Object* a = objects[i];
+                Object* b = objects[j];
+                if (a->GetRigidbody()->CheckCollision(b->GetRigidbody())) {
+                    a->OnCollisionEnter(b);
+                    b->OnCollisionEnter(a);
+                }
+            }
+        }
+    }
+
+    void AddScore(int amount) {
+        score += amount;
+        if (score > highScore) highScore = score;
+    }
+
+    void UpdateHUD() {
+        if (scoreText) {
+            char buffer[64];
+            sprintf_s(buffer, "SCORE: %06d", score);
+            scoreText->SetText(buffer);
+        }
+        if (livesText && player) {
+            char buffer[64];
+            sprintf_s(buffer, "Lives: %d", player->GetLives());
+            livesText->SetText(buffer);
+        }
+        if (highScoreText) {
+            char buffer[64];
+            sprintf_s(buffer, "High: %06d", highScore);
+            highScoreText->SetText(buffer);
+        }
+    }
+
+    void EndGame() {
+        if (player) score += player->GetLives() * 5000;
+        gameOver = true;
+        GameConfig::pendingMode = 11;
+        GameConfig::pendingScore = score;
+        SM.SetNextScene("GameOver");
+    }
+};

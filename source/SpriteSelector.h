@@ -12,66 +12,51 @@
 class SpriteSelector : public Scene {
 private:
     SDL_Texture* backgroundTexture;
-    TTF_Font* font;
+    TTF_Font* fontTitle;
     SDL_Texture* titleTexture;
     int titleW, titleH;
-    SDL_Texture* labelBgTex;
-    int labelBgW, labelBgH;
-    SDL_Texture* labelEnTex;
-    int labelEnW, labelEnH;
-    SDL_Texture* labelVfxTex;
-    int labelVfxW, labelVfxH;
+
     std::vector<ImageButton*> bgButtons;
-    std::vector<ImageButton*> enButtons;
-    std::vector<ImageButton*> vfxButtons;
     Button* btnBack;
+
 public:
     SpriteSelector()
-        : backgroundTexture(nullptr), font(nullptr),
+        : backgroundTexture(nullptr), fontTitle(nullptr),
         titleTexture(nullptr), titleW(0), titleH(0),
-        labelBgTex(nullptr), labelBgW(0), labelBgH(0),
-        labelEnTex(nullptr), labelEnW(0), labelEnH(0),
-        labelVfxTex(nullptr), labelVfxW(0), labelVfxH(0),
         btnBack(nullptr) {
     }
+
     void OnEnter() override {
         backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
-        RM.LoadFont("resources/fonts/fuente.otf", 28);
-        font = RM.GetFont("resources/fonts/fuente.otf");
-        titleTexture = CreateTextTexture("SELECT SPRITES", font, &titleW, &titleH);
-        labelBgTex = CreateTextTexture("Background", font, &labelBgW, &labelBgH);
-        labelEnTex = CreateTextTexture("Enemies", font, &labelEnW, &labelEnH);
-        labelVfxTex = CreateTextTexture("VFX", font, &labelVfxW, &labelVfxH);
+
+        RM.LoadFont("resources/fonts/fuente.otf", 48);
+        fontTitle = RM.GetFont("resources/fonts/fuente.otf");
+        titleTexture = CreateTextTexture("SELECT BACKGROUND", fontTitle, &titleW, &titleH);
+
+        // Calculamos el espacio para centrar 3 botones grandes (200x200) en la pantalla de 1360px
+        int btnSize = 250;
+        int spacing = (1360 - (btnSize * 3)) / 4;
+        int startY = 220;
+
         bgButtons = {
-            new ImageButton(GameConfig::GetBackgroundPath(0), 300, 150, 64, 64),
-            new ImageButton(GameConfig::GetBackgroundPath(1), 380, 150, 64, 64),
-            new ImageButton(GameConfig::GetBackgroundPath(2), 460, 150, 64, 64)
+            new ImageButton(GameConfig::GetBackgroundPath(0), spacing, startY, btnSize, btnSize),
+            new ImageButton(GameConfig::GetBackgroundPath(1), spacing * 2 + btnSize, startY, btnSize, btnSize),
+            new ImageButton(GameConfig::GetBackgroundPath(2), spacing * 3 + btnSize * 2, startY, btnSize, btnSize)
         };
-        enButtons = {
-            new ImageButton(GameConfig::GetEnemyPath(0), 300, 250, 64, 64),
-            new ImageButton(GameConfig::GetEnemyPath(1), 380, 250, 64, 64),
-            new ImageButton(GameConfig::GetEnemyPath(2), 460, 250, 64, 64)
-        };
-        vfxButtons = {
-            new ImageButton(GameConfig::GetVFXPath(0), 300, 350, 64, 64),
-            new ImageButton(GameConfig::GetVFXPath(1), 380, 350, 64, 64),
-            new ImageButton(GameConfig::GetVFXPath(2), 460, 350, 64, 64)
-        };
-        btnBack = new Button("Back", 600, 600, 200, 40, font);
+
+        RM.LoadFont("resources/fonts/fuente.otf", 28);
+        TTF_Font* fontBack = RM.GetFont("resources/fonts/fuente.otf");
+        // ¡Botón bajado a la Y: 680!
+        btnBack = new Button("Back to Menu", (1360 - 250) / 2, 680, 250, 45, fontBack);
     }
+
     void OnExit() override {
-        SDL_DestroyTexture(titleTexture);
-        SDL_DestroyTexture(labelBgTex);
-        SDL_DestroyTexture(labelEnTex);
-        SDL_DestroyTexture(labelVfxTex);
+        if (titleTexture) SDL_DestroyTexture(titleTexture);
         for (auto* b : bgButtons) delete b;
         bgButtons.clear();
-        for (auto* b : enButtons) delete b;
-        enButtons.clear();
-        for (auto* b : vfxButtons) delete b;
-        vfxButtons.clear();
-        delete btnBack;
+        if (btnBack) delete btnBack;
     }
+
     void Update() override {
         for (int i = 0; i < (int)bgButtons.size(); ++i) {
             bgButtons[i]->Update();
@@ -80,34 +65,24 @@ public:
                 backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(i));
             }
         }
-        for (int i = 0; i < (int)enButtons.size(); ++i) {
-            enButtons[i]->Update();
-            if (enButtons[i]->IsClicked()) {
-                GameConfig::SetSelectedEnemies(i);
-            }
-        }
-        for (int i = 0; i < (int)vfxButtons.size(); ++i) {
-            vfxButtons[i]->Update();
-            if (vfxButtons[i]->IsClicked()) {
-                GameConfig::SetSelectedVFX(i);
-            }
-        }
+
         btnBack->Update();
         if (btnBack->IsClicked()) {
             SM.SetNextScene("MainMenu");
         }
     }
+
     void Render() override {
-        SDL_RenderCopy(RM.GetRenderer(), backgroundTexture, nullptr, nullptr);
-        RenderTexture(titleTexture, (1360 - titleW) / 2, 50, titleW, titleH);
-        RenderTexture(labelBgTex, 50, 160, labelBgW, labelBgH);
-        RenderTexture(labelEnTex, 50, 260, labelEnW, labelEnH);
-        RenderTexture(labelVfxTex, 50, 360, labelVfxW, labelVfxH);
+        if (backgroundTexture) {
+            SDL_RenderCopy(RM.GetRenderer(), backgroundTexture, nullptr, nullptr);
+        }
+
+        RenderTexture(titleTexture, (1360 - titleW) / 2, 80, titleW, titleH);
+
         for (auto* b : bgButtons) b->Render();
-        for (auto* b : enButtons) b->Render();
-        for (auto* b : vfxButtons) b->Render();
         btnBack->Render();
     }
+
 private:
     SDL_Texture* CreateTextTexture(const std::string& text, TTF_Font* f, int* outW, int* outH) {
         SDL_Color color = { 0, 0, 0, 255 };
@@ -118,6 +93,7 @@ private:
         SDL_FreeSurface(surf);
         return tex;
     }
+
     void RenderTexture(SDL_Texture* tex, int x, int y, int w, int h) {
         SDL_Rect dest = { x, y, w, h };
         SDL_RenderCopy(RM.GetRenderer(), tex, nullptr, &dest);

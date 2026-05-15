@@ -29,7 +29,7 @@ private:
     ScoreRecord flappyScores[10];
     ScoreRecord galacticScores[10];
     ScoreRecord centipedeScores[10];
-    ScoreRecord pacmanScores[10];
+    ScoreRecord vortexScores[10];
 
     Button* btnBack;
     TTF_Font* fontTitle;
@@ -62,16 +62,16 @@ public:
             strcpy_s(flappyScores[i].name, sizeof(flappyScores[i].name), "---"); flappyScores[i].score = 0;
             strcpy_s(galacticScores[i].name, sizeof(galacticScores[i].name), "---"); galacticScores[i].score = 0;
             strcpy_s(centipedeScores[i].name, sizeof(centipedeScores[i].name), "---"); centipedeScores[i].score = 0;
-            strcpy_s(pacmanScores[i].name, sizeof(pacmanScores[i].name), "---"); pacmanScores[i].score = 0;
+            strcpy_s(vortexScores[i].name, sizeof(vortexScores[i].name), "---"); vortexScores[i].score = 0;
         }
     }
 
     void OnEnter() override {
         backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
 
-        RM.LoadFont("resources/fonts/fuente.otf", 32);
+        RM.LoadFont("resources/fonts/fuente.otf", 36);
         fontTitle = RM.GetFont("resources/fonts/fuente.otf");
-        RM.LoadFont("resources/fonts/fuente.otf", 16);
+        RM.LoadFont("resources/fonts/fuente.otf", 18);
         fontScores = RM.GetFont("resources/fonts/fuente.otf");
 
         titleTexture = CreateTextTexture("HALL OF FAME", fontTitle, &titleW, &titleH);
@@ -87,12 +87,12 @@ public:
         headers[8].tex = CreateTextTexture("FLAPPY SHIP", fontScores, &headers[8].w, &headers[8].h);
         headers[9].tex = CreateTextTexture("GALACTIC", fontScores, &headers[9].w, &headers[9].h);
         headers[10].tex = CreateTextTexture("CENTIPEDE", fontScores, &headers[10].w, &headers[10].h);
-        headers[11].tex = CreateTextTexture("PAC-MAN", fontScores, &headers[11].w, &headers[11].h);
+        headers[11].tex = CreateTextTexture("VORTEX", fontScores, &headers[11].w, &headers[11].h);
 
         LoadScoresFromFile();
 
         RM.LoadFont("resources/fonts/fuente.otf", 24);
-        btnBack = new Button("Back to Menu", (1360 - 220) / 2, 680, 220, 45, RM.GetFont("resources/fonts/fuente.otf"));
+        btnBack = new Button("Back to Menu", (RM.WINDOW_WIDTH - 220) / 2, 680, 220, 45, RM.GetFont("resources/fonts/fuente.otf"));
     }
 
     void OnExit() override {
@@ -112,23 +112,23 @@ public:
 
     void Render() override {
         SDL_RenderCopy(RM.GetRenderer(), backgroundTexture, nullptr, nullptr);
-        RenderTexture(titleTexture, (1360 - titleW) / 2, 20, titleW, titleH);
+        RenderTexture(titleTexture, (RM.WINDOW_WIDTH - titleW) / 2, 20, titleW, titleH);
 
-        // Fila 1
-        int row1Y = 100;
-        int colWidth = 1360 / 6;
+        // Fila 1 (Juegos del 0 al 5)
+        int row1Y = 90;
+        int colWidth = RM.WINDOW_WIDTH / 6;
         for (int i = 0; i < 6; i++) {
             int x = i * colWidth + colWidth / 2;
             RenderTexture(headers[i].tex, x, row1Y, 0, 0, true);
-            RenderTop5(GetArrayByMode(i), x, row1Y + 35);
+            RenderTop5(GetArrayByMode(i), x, row1Y + 45);
         }
 
-        // Fila 2
+        // Fila 2 (Juegos del 6 al 11)
         int row2Y = 380;
         for (int i = 6; i < 12; i++) {
             int x = (i - 6) * colWidth + colWidth / 2;
             RenderTexture(headers[i].tex, x, row2Y, 0, 0, true);
-            RenderTop5(GetArrayByMode(i), x, row2Y + 35);
+            RenderTop5(GetArrayByMode(i), x, row2Y + 45);
         }
 
         btnBack->Render();
@@ -164,7 +164,7 @@ public:
     }
 
     void SaveScoresToFile() {
-        std::ofstream file("resources/highscores_v11.bin", std::ios::binary | std::ios::trunc);
+        std::ofstream file("resources/highscores_v12.bin", std::ios::binary | std::ios::trunc);
         if (!file.is_open()) return;
         file.write(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
         file.write(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
@@ -177,7 +177,7 @@ public:
         file.write(reinterpret_cast<char*>(flappyScores), sizeof(flappyScores));
         file.write(reinterpret_cast<char*>(galacticScores), sizeof(galacticScores));
         file.write(reinterpret_cast<char*>(centipedeScores), sizeof(centipedeScores));
-        file.write(reinterpret_cast<char*>(pacmanScores), sizeof(pacmanScores));
+        file.write(reinterpret_cast<char*>(vortexScores), sizeof(vortexScores));
         file.close();
     }
 
@@ -187,7 +187,7 @@ private:
         case 0: return spaceScores; case 1: return tanksScores; case 2: return splatScores;
         case 3: return asteroidsScores; case 4: return breakoutScores; case 5: return froggerScores;
         case 6: return arenaScores; case 7: return scrollerScores; case 8: return flappyScores;
-        case 9: return galacticScores; case 10: return centipedeScores; case 11: return pacmanScores;
+        case 9: return galacticScores; case 10: return centipedeScores; case 11: return vortexScores;
         default: return nullptr;
         }
     }
@@ -205,9 +205,10 @@ private:
     }
 
     void LoadScoresFromFile() {
-        std::ifstream file("resources/highscores_v11.bin", std::ios::binary);
+        std::ifstream file("resources/highscores_v12.bin", std::ios::binary);
         if (!file.is_open()) {
-            std::ifstream fileOld("resources/highscores_v10.bin", std::ios::binary);
+            // Intentamos cargar la versión anterior si la nueva no existe
+            std::ifstream fileOld("resources/highscores_v11.bin", std::ios::binary);
             if (fileOld.is_open()) {
                 fileOld.read(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
                 fileOld.read(reinterpret_cast<char*>(tanksScores), sizeof(tanksScores));
@@ -235,13 +236,13 @@ private:
         file.read(reinterpret_cast<char*>(flappyScores), sizeof(flappyScores));
         file.read(reinterpret_cast<char*>(galacticScores), sizeof(galacticScores));
         file.read(reinterpret_cast<char*>(centipedeScores), sizeof(centipedeScores));
-        file.read(reinterpret_cast<char*>(pacmanScores), sizeof(pacmanScores));
+        file.read(reinterpret_cast<char*>(vortexScores), sizeof(vortexScores));
         file.close();
     }
 
     SDL_Texture* CreateTextTexture(const std::string& text, TTF_Font* font, int* outW, int* outH) {
         if (!font) return nullptr;
-        SDL_Color color = { 0, 0, 0, 255 };
+        SDL_Color color = { 0, 0, 0, 255 }; // Letras negras para asegurar lectura
         SDL_Surface* surf = TTF_RenderText_Blended(font, text.c_str(), color);
         if (!surf) return nullptr;
         SDL_Texture* tex = SDL_CreateTextureFromSurface(RM.GetRenderer(), surf);
