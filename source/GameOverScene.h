@@ -1,118 +1,110 @@
 #pragma once
 #include "Scene.h"
-#include "SceneManager.h"
 #include "RenderManager.h"
 #include "InputManager.h"
+#include "SceneManager.h"
 #include "GameConfig.h"
 #include "RankingScene.h"
-#include "TimeManager.h"
-#include <SDL_ttf.h>
+#include "AudioManager.h"
 #include <string>
+#include <SDL.h>
+#include <SDL_ttf.h>
 
-class GameOverScene : public Scene
-{
+class GameOverScene : public Scene {
 private:
-    SDL_Texture* backgroundTex = nullptr;
-    TTF_Font* fontTitle = nullptr;
-    TTF_Font* fontNormal = nullptr;
-
-    SDL_Texture* titleTex = nullptr;
-    SDL_Texture* instructionTex = nullptr;
-    SDL_Texture* scoreTex = nullptr;
-    SDL_Texture* usernameTex = nullptr;
+    SDL_Texture* backgroundTexture;
+    SDL_Texture* titleTexture;
+    SDL_Texture* scoreTexture;
+    SDL_Texture* promptTexture;
 
     int titleW, titleH;
-    int instW, instH;
     int scoreW, scoreH;
-    int usernameW, usernameH;
+    int promptW, promptH;
 
-
-    float cursorTimer = 0.0f;
-    bool showCursor = true;
+    float blinkTimer;
+    bool showPrompt;
 
 public:
-    GameOverScene() = default;
-    ~GameOverScene() override = default;
-
-    void OnEnter() override
-    {
-        backgroundTex = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
-
-        RM.LoadFont("resources/fonts/fuente.otf", 48);
-        fontTitle = RM.GetFont("resources/fonts/fuente.otf");
-        RM.LoadFont("resources/fonts/fuente.otf", 28);
-        fontNormal = RM.GetFont("resources/fonts/fuente.otf");
-
-        titleTex = CreateTextTexture("GAME OVER", fontTitle, &titleW, &titleH);
-        instructionTex = CreateTextTexture("Press ENTER to save and continue", fontNormal, &instW, &instH);
-
-        char buffer[64];
-        sprintf_s(buffer, "Score: %d", GameConfig::pendingScore);
-        scoreTex = CreateTextTexture(buffer, fontNormal, &scoreW, &scoreH);
-
-        Input.ClearInputText();
-        Input.StartTextInput();
-
-        cursorTimer = 0.0f;
-        showCursor = true;
+    GameOverScene() : backgroundTexture(nullptr), titleTexture(nullptr), scoreTexture(nullptr), promptTexture(nullptr),
+        titleW(0), titleH(0), scoreW(0), scoreH(0), promptW(0), promptH(0), blinkTimer(0.0f), showPrompt(true) {
     }
 
-    void OnExit() override
-    {
-        Input.StopTextInput();
+    void OnEnter() override {
+        // Cargar fondo actual
+        backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
 
-        if (titleTex) SDL_DestroyTexture(titleTex);
-        if (instructionTex) SDL_DestroyTexture(instructionTex);
-        if (scoreTex) SDL_DestroyTexture(scoreTex);
+        // Cargar fuentes con diferentes tamaños
+        RM.LoadFont("resources/fonts/fuente.otf", 64);
+        TTF_Font* fontTitle = RM.GetFont("resources/fonts/fuente.otf");
+
+        RM.LoadFont("resources/fonts/fuente.otf", 36);
+        TTF_Font* fontScore = RM.GetFont("resources/fonts/fuente.otf");
+
+        RM.LoadFont("resources/fonts/fuente.otf", 24);
+        TTF_Font* fontPrompt = RM.GetFont("resources/fonts/fuente.otf");
+
+        // Crear las texturas de texto
+        SDL_Color colorRed = { 255, 50, 50, 255 };
+        SDL_Color colorWhite = { 255, 255, 255, 255 };
+        SDL_Color colorGrey = { 200, 200, 200, 255 };
+
+        titleTexture = CreateTextTexture("GAME OVER", fontTitle, &titleW, &titleH, colorRed);
+
+        std::string scoreText = "FINAL SCORE: " + std::to_string(GameConfig::pendingScore);
+        scoreTexture = CreateTextTexture(scoreText, fontScore, &scoreW, &scoreH, colorWhite);
+
+        promptTexture = CreateTextTexture("PRESS ENTER TO CONTINUE", fontPrompt, &promptW, &promptH, colorGrey);
+
+        blinkTimer = 0.0f;
+        showPrompt = true;
     }
 
-    void Update() override
-    {
-        cursorTimer += TIME.GetDeltaTime();
-        if (cursorTimer >= 0.5f) {
-            showCursor = !showCursor;
-            cursorTimer = 0.0f;
+    void OnExit() override {
+        // Limpieza de memoria
+        if (titleTexture) SDL_DestroyTexture(titleTexture);
+        if (scoreTexture) SDL_DestroyTexture(scoreTexture);
+        if (promptTexture) SDL_DestroyTexture(promptTexture);
+
+        titleTexture = nullptr;
+        scoreTexture = nullptr;
+        promptTexture = nullptr;
+    }
+
+    void Update() override {
+        // Efecto de parpadeo para el "Press Enter"
+        blinkTimer += TIME.GetDeltaTime();
+        if (blinkTimer >= 0.5f) {
+            showPrompt = !showPrompt;
+            blinkTimer = 0.0f;
         }
 
-        usernameTex = CreateTextTexture(Input.GetInputText(), fontNormal, &usernameW, &usernameH);
-
-
-        if (Input.GetEvent(SDLK_RETURN, DOWN) || Input.GetEvent(SDLK_KP_ENTER, DOWN))
-        {
-            RankingScene::InsertScoreForMode(GameConfig::pendingMode, Input.GetInputText(), GameConfig::pendingScore);
-            SM.SetNextScene("MainMenu");
+        // Si pulsamos Enter, guardamos como "Player" y vamos al Ranking
+        if (Input.GetEvent(SDLK_RETURN, DOWN) || Input.GetEvent(SDLK_KP_ENTER, DOWN)) {
+            // Pasamos un string vacío o "Player", el RankingScene ya tiene la lógica: name.empty() ? "Player" : name
+            RankingScene::InsertScoreForMode(GameConfig::pendingMode, "Player", GameConfig::pendingScore);
+            AM.PlayClip("button_click", 0);
+            SM.SetNextScene("RankingScene");
         }
     }
 
-    void Render() override
-    {
-        if (backgroundTex)
-        {
-            SDL_Rect destRect = { 0, 0, RM.WINDOW_WIDTH, RM.WINDOW_HEIGHT };
-            SDL_RenderCopy(RM.GetRenderer(), backgroundTex, nullptr, &destRect);
+    void Render() override {
+        // Dibujar el fondo
+        if (backgroundTexture) {
+            SDL_RenderCopy(RM.GetRenderer(), backgroundTexture, nullptr, nullptr);
         }
 
-        RenderTexture(titleTex, (RM.WINDOW_WIDTH - titleW) / 2, 100, titleW, titleH);
-        RenderTexture(scoreTex, (RM.WINDOW_WIDTH - scoreW) / 2, 200, scoreW, scoreH);
+        // Dibujar los textos centrados en pantalla
+        RenderTexture(titleTexture, (RM.WINDOW_WIDTH - titleW) / 2, 200, titleW, titleH);
+        RenderTexture(scoreTexture, (RM.WINDOW_WIDTH - scoreW) / 2, 350, scoreW, scoreH);
 
-     
-
-        SDL_Rect boxRect = { (RM.WINDOW_WIDTH - 400) / 2, 300, 400, 60 };
-        SDL_SetRenderDrawColor(RM.GetRenderer(), 80, 80, 80, 255);
-        SDL_RenderFillRect(RM.GetRenderer(), &boxRect);
-        SDL_SetRenderDrawColor(RM.GetRenderer(), 255, 255, 255, 255);
-        SDL_RenderDrawRect(RM.GetRenderer(), &boxRect);
-
-       
-        RenderTexture(usernameTex, boxRect.x + 20, boxRect.y + (boxRect.h - usernameH) / 2, usernameW, usernameH);
-
-        RenderTexture(instructionTex, (RM.WINDOW_WIDTH - instW) / 2, 450, instW, instH);
+        if (showPrompt) {
+            RenderTexture(promptTexture, (RM.WINDOW_WIDTH - promptW) / 2, 500, promptW, promptH);
+        }
     }
 
 private:
-    SDL_Texture* CreateTextTexture(const std::string& text, TTF_Font* font, int* outW, int* outH) {
-        if (!font || text.empty()) return nullptr;
-        SDL_Color color = { 255, 255, 255, 255 };
+    SDL_Texture* CreateTextTexture(const std::string& text, TTF_Font* font, int* outW, int* outH, SDL_Color color) {
+        if (!font) return nullptr;
         SDL_Surface* surf = TTF_RenderText_Blended(font, text.c_str(), color);
         if (!surf) return nullptr;
         SDL_Texture* tex = SDL_CreateTextureFromSurface(RM.GetRenderer(), surf);
