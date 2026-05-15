@@ -60,7 +60,6 @@ void Game::Init() {
     AM.LoadClip("button_click");
 
     RM.LoadTexture("resources/player.png");
-    RM.LoadTexture("resources/player_tank.png");
     RM.LoadTexture("resources/tank_base.png");
     RM.LoadTexture("resources/tank_turret.png");
     RM.LoadTexture("resources/player_swat.png");
@@ -79,43 +78,12 @@ void Game::Init() {
     RM.LoadTexture("resources/enemy_exploding.png");
     RM.LoadTexture("resources/enemy_splat.png");
 
-    RM.LoadTexture("resources/basicEnemy2.png");
-    RM.LoadTexture("resources/enemy2.png");
-    RM.LoadTexture("resources/enemy_seeker2.png");
-    RM.LoadTexture("resources/enemy_shooting2.png");
-    RM.LoadTexture("resources/enemy_aiming2.png");
-    RM.LoadTexture("resources/enemy_exploding2.png");
-    RM.LoadTexture("resources/enemy_splat2.png");
-
-    RM.LoadTexture("resources/basicEnemy3.png");
-    RM.LoadTexture("resources/enemy3.png");
-    RM.LoadTexture("resources/enemy_seeker3.png");
-    RM.LoadTexture("resources/enemy_shooting3.png");
-    RM.LoadTexture("resources/enemy_aiming3.png");
-    RM.LoadTexture("resources/enemy_exploding3.png");
-    RM.LoadTexture("resources/enemy_splat3.png");
-
     RM.LoadTexture("resources/SpriteBackground1.png");
     RM.LoadTexture("resources/SpriteBackground2.png");
     RM.LoadTexture("resources/SpriteBackground3.png");
 
-    RM.LoadTexture("resources/SpriteEnemies1.png");
-    RM.LoadTexture("resources/SpriteEnemies2.png");
-    RM.LoadTexture("resources/SpriteEnemies3.png");
-
-    RM.LoadTexture("resources/SpriteVFX1.png");
-    RM.LoadTexture("resources/SpriteVFX2.png");
-    RM.LoadTexture("resources/SpriteVFX3.png");
-
     RM.LoadTexture("resources/explosion.png");
-    RM.LoadTexture("resources/explosion2.png");
-    RM.LoadTexture("resources/explosion3.png");
-
     RM.LoadTexture("resources/swat_animation.png");
-
-    RM.LoadTexture("resources/shoot_animation.png");
-    RM.LoadTexture("resources/shoot_animation2.png");
-    RM.LoadTexture("resources/shoot_animation3.png");
 
     SM.AddScene("SplashScreen", new SplashScreen());
     SM.AddScene("MainMenu", new MainMenu());

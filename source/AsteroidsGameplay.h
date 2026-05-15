@@ -10,6 +10,7 @@
 #include "SceneManager.h"
 #include <cstdlib>
 #include <vector>
+#include <cmath>
 
 class AsteroidsGameplay : public Scene {
 private:
@@ -160,14 +161,14 @@ private:
                 if (player) {
                     float dx = pos.x - player->GetTransform()->position.x;
                     float dy = pos.y - player->GetTransform()->position.y;
-                    if (sqrt(dx * dx + dy * dy) > 250.0f) safePos = true;
+                    if (std::sqrt(dx * dx + dy * dy) > 250.0f) safePos = true;
                 }
                 else safePos = true;
             }
-            float angle = (rand() % 360) * (M_PI / 180.0f);
+            float angle = (rand() % 360) * (3.14159f / 180.0f);
             float speed = 60.0f + (waveNum * 15.0f);
-            Vector2 vel(cos(angle) * speed, sin(angle) * speed);
-            SPAWN.SpawnObject(new AsteroidsEnemy(pos, 3, vel));
+            Vector2 vel(std::cos(angle) * speed, std::sin(angle) * speed);
+            SPAWN.SpawnObject(new AsteroidsEnemy(pos, vel, 3));
         }
     }
 
