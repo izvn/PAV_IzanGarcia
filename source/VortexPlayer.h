@@ -30,7 +30,6 @@ public:
     }
 
     void HandleInput() override {
-        // Usamos SDL nativo para obtener el ratón y evitar fallos del InputManager
         int mx, my;
         SDL_GetMouseState(&mx, &my);
         Vector2 mousePos((float)mx, (float)my);

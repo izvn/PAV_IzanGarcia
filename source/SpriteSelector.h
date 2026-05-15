@@ -33,7 +33,6 @@ public:
         fontTitle = RM.GetFont("resources/fonts/fuente.otf");
         titleTexture = CreateTextTexture("SELECT BACKGROUND", fontTitle, &titleW, &titleH);
 
-        // Calculamos el espacio para centrar 3 botones grandes (200x200) en la pantalla de 1360px
         int btnSize = 250;
         int spacing = (1360 - (btnSize * 3)) / 4;
         int startY = 220;
@@ -46,7 +45,6 @@ public:
 
         RM.LoadFont("resources/fonts/fuente.otf", 28);
         TTF_Font* fontBack = RM.GetFont("resources/fonts/fuente.otf");
-        // ¡Botón bajado a la Y: 680!
         btnBack = new Button("Back to Menu", (1360 - 250) / 2, 680, 250, 45, fontBack);
     }
 

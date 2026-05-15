@@ -30,10 +30,8 @@ public:
     }
 
     void OnEnter() override {
-        // Cargar fondo actual
         backgroundTexture = RM.GetTexture(GameConfig::GetBackgroundPath(GameConfig::GetSelectedBackground()));
 
-        // Cargar fuentes con diferentes tamaños
         RM.LoadFont("resources/fonts/fuente.otf", 64);
         TTF_Font* fontTitle = RM.GetFont("resources/fonts/fuente.otf");
 
@@ -43,7 +41,6 @@ public:
         RM.LoadFont("resources/fonts/fuente.otf", 24);
         TTF_Font* fontPrompt = RM.GetFont("resources/fonts/fuente.otf");
 
-        // Crear las texturas de texto
         SDL_Color colorRed = { 255, 50, 50, 255 };
         SDL_Color colorWhite = { 255, 255, 255, 255 };
         SDL_Color colorGrey = { 200, 200, 200, 255 };
@@ -60,7 +57,6 @@ public:
     }
 
     void OnExit() override {
-        // Limpieza de memoria
         if (titleTexture) SDL_DestroyTexture(titleTexture);
         if (scoreTexture) SDL_DestroyTexture(scoreTexture);
         if (promptTexture) SDL_DestroyTexture(promptTexture);
@@ -71,16 +67,13 @@ public:
     }
 
     void Update() override {
-        // Efecto de parpadeo para el "Press Enter"
         blinkTimer += TIME.GetDeltaTime();
         if (blinkTimer >= 0.5f) {
             showPrompt = !showPrompt;
             blinkTimer = 0.0f;
         }
 
-        // Si pulsamos Enter, guardamos como "Player" y vamos al Ranking
         if (Input.GetEvent(SDLK_RETURN, DOWN) || Input.GetEvent(SDLK_KP_ENTER, DOWN)) {
-            // Pasamos un string vacío o "Player", el RankingScene ya tiene la lógica: name.empty() ? "Player" : name
             RankingScene::InsertScoreForMode(GameConfig::pendingMode, "Player", GameConfig::pendingScore);
             AM.PlayClip("button_click", 0);
             SM.SetNextScene("RankingScene");
@@ -88,12 +81,10 @@ public:
     }
 
     void Render() override {
-        // Dibujar el fondo
         if (backgroundTexture) {
             SDL_RenderCopy(RM.GetRenderer(), backgroundTexture, nullptr, nullptr);
         }
 
-        // Dibujar los textos centrados en pantalla
         RenderTexture(titleTexture, (RM.WINDOW_WIDTH - titleW) / 2, 200, titleW, titleH);
         RenderTexture(scoreTexture, (RM.WINDOW_WIDTH - scoreW) / 2, 350, scoreW, scoreH);
 

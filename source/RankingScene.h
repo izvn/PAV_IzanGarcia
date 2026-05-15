@@ -114,7 +114,6 @@ public:
         SDL_RenderCopy(RM.GetRenderer(), backgroundTexture, nullptr, nullptr);
         RenderTexture(titleTexture, (RM.WINDOW_WIDTH - titleW) / 2, 20, titleW, titleH);
 
-        // Fila 1 (Juegos del 0 al 5)
         int row1Y = 90;
         int colWidth = RM.WINDOW_WIDTH / 6;
         for (int i = 0; i < 6; i++) {
@@ -123,7 +122,6 @@ public:
             RenderTop5(GetArrayByMode(i), x, row1Y + 45);
         }
 
-        // Fila 2 (Juegos del 6 al 11)
         int row2Y = 380;
         for (int i = 6; i < 12; i++) {
             int x = (i - 6) * colWidth + colWidth / 2;
@@ -207,7 +205,6 @@ private:
     void LoadScoresFromFile() {
         std::ifstream file("resources/highscores_v12.bin", std::ios::binary);
         if (!file.is_open()) {
-            // Intentamos cargar la versión anterior si la nueva no existe
             std::ifstream fileOld("resources/highscores_v11.bin", std::ios::binary);
             if (fileOld.is_open()) {
                 fileOld.read(reinterpret_cast<char*>(spaceScores), sizeof(spaceScores));
@@ -242,7 +239,7 @@ private:
 
     SDL_Texture* CreateTextTexture(const std::string& text, TTF_Font* font, int* outW, int* outH) {
         if (!font) return nullptr;
-        SDL_Color color = { 0, 0, 0, 255 }; // Letras negras para asegurar lectura
+        SDL_Color color = { 0, 0, 0, 255 };
         SDL_Surface* surf = TTF_RenderText_Blended(font, text.c_str(), color);
         if (!surf) return nullptr;
         SDL_Texture* tex = SDL_CreateTextureFromSurface(RM.GetRenderer(), surf);

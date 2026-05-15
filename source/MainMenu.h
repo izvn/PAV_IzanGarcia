@@ -52,7 +52,7 @@ public:
         buttons.push_back(new Button("Centipede", 1030, 300, 250, 40, font));
         buttons.push_back(new Button("Vortex", 1030, 360, 250, 40, font));
 
-        buttons.push_back(new Button("Select Background", 555, 400, 250, 40, font)); // <-- Cambiado el nombre
+        buttons.push_back(new Button("Select Background", 555, 400, 250, 40, font));
         buttons.push_back(new Button("Check Ranking", 555, 460, 250, 40, font));
         std::string audioLabel = AM.GetMuted() ? "Audio Disabled" : "Audio Enabled";
         buttons.push_back(new Button(audioLabel, 555, 520, 250, 40, font));
@@ -111,7 +111,7 @@ public:
         else if (label == "Galactic") PrepareSceneChange("Galactic");
         else if (label == "Centipede") PrepareSceneChange("Centipede");
         else if (label == "Vortex") PrepareSceneChange("Vortex");
-        else if (label == "Select Background") PrepareSceneChange("SpriteSelector"); // <-- Apunta a la misma escena
+        else if (label == "Select Background") PrepareSceneChange("SpriteSelector");
         else if (label == "Check Ranking") PrepareSceneChange("RankingScene");
         else if (label == "Audio Enabled" || label == "Audio Disabled") {
             if (AM.GetMuted()) {

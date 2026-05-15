@@ -69,6 +69,7 @@ void Game::Init() {
     RM.LoadTexture("resources/SplashScreen.png");
     RM.LoadTexture("resources/mainmenu.png");
     RM.LoadTexture("resources/wavecompleted.png");
+    RM.LoadTexture("resources/shoot_animation.png");
 
     RM.LoadTexture("resources/basicEnemy.png");
     RM.LoadTexture("resources/enemy.png");
